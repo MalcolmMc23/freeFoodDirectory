@@ -1,1 +1,1 @@
-# freeFoodDirectory
+# freeFoodDirectory [Eric has contributed]
