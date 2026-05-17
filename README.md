@@ -1,7 +1,6 @@
-<<<<<<< HEAD
-# freeFoodDirectory [Eric has contributed]
-=======
 # San Francisco Map
+
+Contributor note: Eric has contributed.
 
 Minimal full-screen Google Maps page centered on San Francisco.
 
@@ -24,4 +23,3 @@ Open `http://localhost:3000`.
 
 - The app reads the browser key from `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`.
 - The current UI is intentionally minimal: just the base Google map and default white controls.
->>>>>>> 78825a7 (Build minimal Google Maps viewer)
