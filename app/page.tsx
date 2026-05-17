@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { GoogleMapView } from "../components/google-map-view";
+// TODO: replace MOCK_LOCATIONS with a Supabase fetch once connected
+import { MOCK_LOCATIONS } from "../lib/mock-locations";
 import styles from "./page.module.css";
 
 export default function HomePage() {
@@ -10,7 +12,7 @@ export default function HomePage() {
   if (showMap) {
     return (
       <main>
-        <GoogleMapView />
+        <GoogleMapView locations={MOCK_LOCATIONS} />
       </main>
     );
   }

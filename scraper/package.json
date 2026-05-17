@@ -1,0 +1,16 @@
+{
+  "name": "food-bank-scraper",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "scrape": "tsx scrape.ts"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3",
+    "@types/node": "^22.0.0"
+  }
+}
