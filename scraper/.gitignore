@@ -1,0 +1,4 @@
+node_modules/
+data/latest.json
+data/previous.json
+data/changes.json
