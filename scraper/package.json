@@ -7,7 +7,9 @@
     "scrape": "tsx scrape.ts"
   },
   "dependencies": {
-    "playwright": "^1.49.0"
+    "@supabase/supabase-js": "^2.105.4",
+    "playwright": "^1.49.0",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "tsx": "^4.19.0",
