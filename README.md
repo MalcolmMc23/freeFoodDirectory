@@ -89,3 +89,6 @@ Behavior:
 - writes local JSON snapshots under `scraper/data/`
 - upserts pantry rows into `public.locations` when Supabase env vars are present
 - stores raw scrape payloads in `public.location_snapshots`
+
+
+test
