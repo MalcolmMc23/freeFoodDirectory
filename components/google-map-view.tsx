@@ -215,6 +215,13 @@ export function GoogleMapView({ locations }: Props) {
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         const mappableLocations = locations.filter(hasCoordinates);
 
+        // Tapping the map (outside any marker) dismisses the open popup.
+        // Marker clicks don't propagate to the map, so pin taps still work.
+        map.addListener("click", () => {
+          openWindow?.close();
+          openWindow = null;
+        });
+
         for (const loc of mappableLocations) {
           const openNow = isOpenToday(loc);
           const marker = new Marker({
