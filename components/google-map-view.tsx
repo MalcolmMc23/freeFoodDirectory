@@ -54,141 +54,66 @@ const loadGoogleMaps = async (apiKey: string) => {
   return window.__googleMapsLoader;
 };
 
+function getTodayName(): string {
+  return new Date().toLocaleDateString("en-US", { weekday: "long" });
+}
+
+function isOpenToday(loc: Location): boolean {
+  if (!loc.distributionDay) return false;
+  return loc.distributionDay.toLowerCase() === getTodayName().toLowerCase();
+}
+
 function infoWindowContent(loc: Location): string {
   const title = escapeHtml(loc.name);
   const address = escapeHtml(formatLocationAddress(loc));
-  const category = loc.category ? escapeHtml(formatCategory(loc.category)) : "";
-  const day = loc.distributionDay ? escapeHtml(loc.distributionDay) : "";
   const time = loc.distributionTimeText ? escapeHtml(loc.distributionTimeText) : "";
-  const availability = loc.availabilityStatus ? escapeHtml(loc.availabilityStatus) : "";
-  const enrollmentFrequency = loc.enrollmentFrequency ? escapeHtml(loc.enrollmentFrequency) : "";
-  const enrollmentTime = loc.enrollmentTimeText ? escapeHtml(loc.enrollmentTimeText) : "";
-  const languages = loc.additionalLanguages.length ? escapeHtml(loc.additionalLanguages.join(", ")) : "";
-  const serviceArea = loc.zipCodesServed.length ? escapeHtml(loc.zipCodesServed.join(", ")) : "";
-  const nextDistribution = loc.nextDistributionDates.length
-    ? loc.nextDistributionDates
-        .map((date) => `<div style="margin:0 0 3px">${escapeHtml(date)}</div>`)
-        .join("")
-    : "";
-  const detailItems = loc.additionalInfo;
+  const openToday = isOpenToday(loc);
+  const nextDate = loc.nextDistributionDates[0] ?? null;
   const directionsUrl = googleMapsDirectionsUrl(loc);
   const siteUrl = loc.siteUrl ?? loc.sourceUrl;
 
-  const details = detailItems.length
-    ? `
-      <div style="margin-top:12px">
-        <div style="margin:0 0 6px;color:#6b6b74;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase">
-          Notes
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${detailItems
-            .map(
-              (item) => `
-                <div style="padding:8px 10px;border:1.5px dashed rgba(236,236,239,0.22);border-radius:6px;background:#1c1c22;color:#a4a4ad;font-family:'Patrick Hand',sans-serif;font-size:13px;line-height:1.4">
-                  ${escapeHtml(item)}
-                </div>
-              `,
-            )
-            .join("")}
-        </div>
-      </div>
-    `
+  const availabilityColor =
+    loc.availabilityStatus?.toLowerCase().includes("waitlist") ? "#e07a5f"
+    : loc.availabilityStatus?.toLowerCase().includes("available") ? "#81b29a"
+    : "#a4a4ad";
+
+  const statusBadge = openToday
+    ? `<div style="display:inline-block;padding:2px 8px;border-radius:4px;background:#81b29a;color:#0e1a14;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">Open Today</div>`
+    : nextDate
+      ? `<div style="display:inline-block;padding:2px 8px;border-radius:4px;background:#1c1c22;border:1px solid rgba(236,236,239,0.15);color:#6b6b74;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">Next: ${escapeHtml(nextDate)}</div>`
+      : "";
+
+  const timeRow = time
+    ? `<div style="margin-bottom:6px;font-family:'Patrick Hand',sans-serif;font-size:15px;color:#ececef">${time}</div>`
     : "";
 
-  const rows = [
-    infoRow("Day", day),
-    infoRow("Next", nextDistribution),
-    infoRow("Time", time),
-    infoRow("Status", availability),
-    infoRow("Enroll", enrollmentFrequency),
-    infoRow("Enroll Time", enrollmentTime),
-    infoRow("Languages", languages),
-    infoRow("Serves", serviceArea),
-  ]
-    .filter(Boolean)
-    .join("");
+  const availRow = loc.availabilityStatus
+    ? `<div style="margin-bottom:10px;font-family:'Patrick Hand',sans-serif;font-size:14px;color:${availabilityColor}">${escapeHtml(loc.availabilityStatus)}</div>`
+    : "";
+
+  const languages = loc.additionalLanguages.length
+    ? `<div style="margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6b6b74;text-transform:uppercase;letter-spacing:1px">${escapeHtml(loc.additionalLanguages.join(" · "))}</div>`
+    : "";
 
   return `
-    <div style="min-width:280px;max-width:320px;padding:14px;background:#16161a;color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
-        <div style="flex:1">
-          <div style="margin:0 0 4px;font-family:'Patrick Hand',sans-serif;font-size:20px;font-weight:400;line-height:1.15;color:#ececef">
-            ${title}
-          </div>
-          <div style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6b6b74;line-height:1.3">
-            ${address}
-          </div>
-        </div>
-        ${
-          category
-            ? `
-              <div style="flex-shrink:0;padding:3px 8px;border-radius:4px;background:transparent;border:1px solid rgba(236,236,239,0.22);color:#a4a4ad;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase">
-                ${category}
-              </div>
-            `
-            : ""
-        }
-      </div>
-
-      ${
-        loc.outsideZipCode
-          ? `
-            <div style="margin-bottom:10px;padding:8px 10px;border-radius:6px;background:#1c1c22;border:1.5px dashed rgba(236,236,239,0.22);color:#6b6b74;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase">
-              Outside your zip code
-            </div>
-          `
-          : ""
-      }
-
-      <div style="display:flex;flex-direction:column;gap:0;margin-top:4px">
-        ${rows}
-
-        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding-top:10px;border-top:1px dashed rgba(236,236,239,0.22);margin-top:4px">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:#6b6b74;padding-top:2px">
-            Actions
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px">
-            <a
-              href="${directionsUrl}"
-              target="_blank"
-              rel="noopener noreferrer"
-              style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:6px;background:#f3a64a;border:1.5px solid #f3a64a;color:#1a1208;text-decoration:none;font-family:'Patrick Hand',sans-serif;font-size:14px;font-weight:400"
-            >
-              Directions →
-            </a>
-            ${
-              siteUrl
-                ? `
-                  <a
-                    href="${escapeHtml(siteUrl)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:6px;background:transparent;border:1.5px dashed rgba(236,236,239,0.22);color:#a4a4ad;text-decoration:none;font-family:'Patrick Hand',sans-serif;font-size:14px;font-weight:400"
-                  >
-                    Website ↗
-                  </a>
-                `
-                : ""
-            }
-          </div>
-        </div>
-      </div>
-
-      ${details}
-    </div>
-  `;
-}
-
-function infoRow(label: string, value: string): string {
-  if (!value) return "";
-
-  return `
-    <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding-top:10px;border-top:1px dashed rgba(236,236,239,0.22);margin-top:4px">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:#6b6b74;padding-top:3px">
-        ${escapeHtml(label)}
-      </div>
-      <div style="font-family:'Patrick Hand',sans-serif;font-size:14px;line-height:1.4;color:#ececef">
-        ${value}
+    <div style="min-width:260px;max-width:300px;padding:10px 14px 12px;background:#16161a;color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif">
+      ${statusBadge}
+      <div style="margin:0 0 4px;font-family:'Patrick Hand',sans-serif;font-size:19px;line-height:1.2;color:#ececef">${title}</div>
+      <div style="margin:0 0 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6b6b74;line-height:1.4">${address}</div>
+      ${timeRow}
+      ${availRow}
+      ${languages}
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding-top:10px;border-top:1px dashed rgba(236,236,239,0.15)">
+        <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer"
+          style="display:inline-flex;align-items:center;padding:8px 14px;border-radius:6px;background:#f3a64a;color:#1a1208;text-decoration:none;font-family:'Patrick Hand',sans-serif;font-size:14px">
+          Directions →
+        </a>
+        ${siteUrl ? `
+          <a href="${escapeHtml(siteUrl)}" target="_blank" rel="noopener noreferrer"
+            style="display:inline-flex;align-items:center;padding:8px 14px;border-radius:6px;background:transparent;border:1px dashed rgba(236,236,239,0.22);color:#a4a4ad;text-decoration:none;font-family:'Patrick Hand',sans-serif;font-size:14px">
+            Website ↗
+          </a>
+        ` : ""}
       </div>
     </div>
   `;
@@ -201,21 +126,6 @@ function escapeHtml(value: string): string {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-function formatCategory(category: string): string {
-  return category
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function splitDescription(description: string | null): string[] {
-  if (!description) return [];
-
-  return description
-    .split(/(?:\.\s+)|(?:•)|(?:;\s+)/)
-    .map((item) => item.trim())
-    .filter(Boolean);
 }
 
 function googleMapsDirectionsUrl(loc: Location): string {
@@ -306,10 +216,20 @@ export function GoogleMapView({ locations }: Props) {
         const mappableLocations = locations.filter(hasCoordinates);
 
         for (const loc of mappableLocations) {
+          const openNow = isOpenToday(loc);
           const marker = new Marker({
             map,
             position: { lat: loc.lat, lng: loc.lng },
             title: loc.name,
+            icon: {
+              path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z",
+              fillColor: openNow ? "#81b29a" : "#f3a64a",
+              fillOpacity: 1,
+              strokeColor: openNow ? "#4a8c6f" : "#c47d28",
+              strokeWeight: 1.5,
+              scale: 1.6,
+              anchor: { x: 12, y: 24 },
+            },
           });
 
           const infoWindow = new InfoWindow({
