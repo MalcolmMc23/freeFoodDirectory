@@ -137,6 +137,10 @@ function infoWindowContent(loc: Location): string {
       </div>
     </details>`;
 
+  const phoneRow = loc.phone
+    ? `<a href="tel:${escapeHtml(loc.phone)}" style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:12px;color:#a4a4ad;text-decoration:none"><span>📞</span><span>${escapeHtml(loc.phone)}</span></a>`
+    : "";
+
   return `
     <div style="min-width:260px;max-width:300px;padding:12px 14px 12px;background:#16161a;color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif;position:relative">
       <button onclick="window.__closeInfoWindow()" style="position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;color:#6b6b74;font-size:18px;line-height:1;padding:0;margin:0" aria-label="Close">✕</button>
@@ -144,9 +148,10 @@ function infoWindowContent(loc: Location): string {
         ${openBadge.replace(' style="', ' style="margin-bottom:0;')}
       </div>
       <div style="margin:0 0 4px;font-size:19px;line-height:1.2;color:#ececef;font-weight:600">${title}</div>
-      <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:10px;font-size:12px;color:#6b6b74;line-height:1.4">
+      <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;font-size:12px;color:#6b6b74;line-height:1.4">
         <span>📍</span><span>${address}</span>
       </div>
+      ${phoneRow}
       ${timeRow}
       ${availRow}
       ${languages}

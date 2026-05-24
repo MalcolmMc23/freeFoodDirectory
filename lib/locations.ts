@@ -26,6 +26,7 @@ type LocationRow = Pick<
   | "additional_info"
   | "zip_codes_served"
   | "outside_zip_code"
+  | "phone"
   | "source_url"
   | "site_url"
   | "active"
@@ -43,7 +44,7 @@ export async function getLocations(): Promise<Location[]> {
   const { data, error } = await supabase
     .from("locations")
     .select(
-      "id, slug, name, address_line, city, state, postal_code, lat, lng, geocode_status, category, distribution_day, next_distribution_dates, distribution_time_text, availability_status, enrollment_frequency, enrollment_time_text, additional_languages, additional_info, zip_codes_served, outside_zip_code, source_url, site_url, active, last_scraped_at, last_changed_at",
+      "id, slug, name, address_line, city, state, postal_code, lat, lng, geocode_status, category, distribution_day, next_distribution_dates, distribution_time_text, availability_status, enrollment_frequency, enrollment_time_text, additional_languages, additional_info, zip_codes_served, outside_zip_code, phone, source_url, site_url, active, last_scraped_at, last_changed_at",
     )
     .eq("active", true)
     .order("name", { ascending: true });
@@ -78,6 +79,7 @@ function mapLocationRow(row: LocationRow): Location {
     additionalInfo: row.additional_info ?? [],
     zipCodesServed: row.zip_codes_served ?? [],
     outsideZipCode: row.outside_zip_code,
+    phone: row.phone,
     sourceUrl: row.source_url,
     siteUrl: row.site_url,
     active: row.active,

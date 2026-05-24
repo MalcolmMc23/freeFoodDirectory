@@ -20,6 +20,7 @@ export type Location = {
   additionalInfo: string[];
   zipCodesServed: string[];
   outsideZipCode: boolean;
+  phone: string | null;
   sourceUrl: string | null;
   siteUrl: string | null;
   active: boolean;

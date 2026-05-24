@@ -28,6 +28,7 @@ export type Database = {
           additional_info: string[];
           zip_codes_served: string[];
           outside_zip_code: boolean;
+          phone: string | null;
           source_url: string | null;
           site_url: string | null;
           active: boolean;
@@ -58,6 +59,7 @@ export type Database = {
           additional_info?: string[];
           zip_codes_served?: string[];
           outside_zip_code?: boolean;
+          phone?: string | null;
           source_url?: string | null;
           site_url?: string | null;
           active?: boolean;
@@ -88,6 +90,7 @@ export type Database = {
           additional_info?: string[];
           zip_codes_served?: string[];
           outside_zip_code?: boolean;
+          phone?: string | null;
           source_url?: string | null;
           site_url?: string | null;
           active?: boolean;
