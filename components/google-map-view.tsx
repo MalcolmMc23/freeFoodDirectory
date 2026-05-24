@@ -18,6 +18,13 @@ declare global {
         Map: new (el: HTMLElement, opts: object) => {
           addListener: (event: string, cb: () => void) => void;
           getZoom: () => number;
+          data: {
+            loadGeoJson: (url: string) => void;
+            setStyle: (style: object) => void;
+            overrideStyle: (feature: object, style: object) => void;
+            revertStyle: () => void;
+            addListener: (event: string, cb: (e: { feature: object }) => void) => void;
+          };
         };
         Marker: new (opts: { map: object; position: { lat: number; lng: number }; title?: string; icon?: object | string; clickable?: boolean }) => {
           addListener: (event: string, cb: () => void) => void;
@@ -264,6 +271,22 @@ export function GoogleMapView({ locations }: Props) {
           ],
         });
 
+        // Neighborhood outlines: invisible by default, gold stroke on hover.
+        map.data.loadGeoJson("/sf-neighborhoods.geojson");
+        map.data.setStyle({ strokeOpacity: 0, fillOpacity: 0 });
+        map.data.addListener("mouseover", (e) => {
+          map.data.overrideStyle(e.feature, {
+            strokeColor: "#f3a64a",
+            strokeWeight: 3,
+            strokeOpacity: 1,
+            fillColor: "#f3a64a",
+            fillOpacity: 0.08,
+          });
+        });
+        map.data.addListener("mouseout", () => {
+          map.data.revertStyle();
+        });
+
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
           openWindow?.close();
@@ -271,8 +294,6 @@ export function GoogleMapView({ locations }: Props) {
         };
         const mappableLocations = locations.filter(hasCoordinates);
 
-        // Tapping the map (outside any marker) dismisses the open popup.
-        // Marker clicks don't propagate to the map, so pin taps still work.
         map.addListener("click", () => {
           openWindow?.close();
           openWindow = null;
