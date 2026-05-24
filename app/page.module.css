@@ -34,3 +34,15 @@
 .button:hover {
   opacity: 0.88;
 }
+
+.faqLink {
+  font-family: var(--hand);
+  font-size: 14px;
+  color: var(--ink-mute);
+  text-decoration: none;
+  transition: color 120ms ease-out;
+}
+
+.faqLink:hover {
+  color: var(--ink-dim);
+}

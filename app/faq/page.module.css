@@ -1,0 +1,57 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 48px 24px 80px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.back {
+  font-family: var(--hand);
+  font-size: 15px;
+  color: var(--ink-dim);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 40px;
+  transition: color 120ms ease-out;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.heading {
+  font-family: var(--hand);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--accent);
+  margin: 0 0 40px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.item {
+  border-top: 1px solid var(--stroke);
+  padding-top: 28px;
+}
+
+.question {
+  font-family: var(--hand);
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+
+.answer {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink-dim);
+  margin: 0;
+  line-height: 1.6;
+}
