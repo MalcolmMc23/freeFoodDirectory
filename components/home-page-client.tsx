@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { Location } from "../lib/types";
 import { GoogleMapView } from "./google-map-view";
@@ -26,6 +27,9 @@ export function HomePageClient({ locations }: Props) {
       <button className={styles.button} onClick={() => setShowMap(true)}>
         Show Map
       </button>
+      <Link href="/faq" className={styles.faqLink}>
+        FAQ
+      </Link>
     </main>
   );
 }
