@@ -60,7 +60,9 @@ function getTodayName(): string {
 
 function isOpenToday(loc: Location): boolean {
   if (!loc.distributionDay) return false;
-  return loc.distributionDay.toLowerCase() === getTodayName().toLowerCase();
+  const day = loc.distributionDay.toLowerCase();
+  if (day === "daily" || day === "every day" || day === "monday-sunday" || day === "monday - sunday") return true;
+  return day === getTodayName().toLowerCase();
 }
 
 function infoWindowContent(loc: Location): string {
@@ -68,50 +70,96 @@ function infoWindowContent(loc: Location): string {
   const address = escapeHtml(formatLocationAddress(loc));
   const time = loc.distributionTimeText ? escapeHtml(loc.distributionTimeText) : "";
   const openToday = isOpenToday(loc);
-  const nextDate = loc.nextDistributionDates[0] ?? null;
   const directionsUrl = googleMapsDirectionsUrl(loc);
   const siteUrl = loc.siteUrl ?? loc.sourceUrl;
+
+  const openBadge = openToday
+    ? `<div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#1a2e1f;border:1px solid #4caf6e;color:#4caf6e;font-size:13px;font-weight:700;margin-bottom:10px">
+        🟢 Open Now
+       </div>`
+    : `<div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#2a1a1a;border:1px solid #e07a5f;color:#e07a5f;font-size:13px;font-weight:700;margin-bottom:10px">
+        🔴 Closed
+       </div>`;
+
+  const timeSlots = time ? time.split(",").map(s => s.trim()).filter(Boolean) : [];
+  const timeRow = timeSlots.length
+    ? `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+        <span style="font-size:16px;margin-top:2px">⏰</span>
+        <div>
+          <div style="font-size:10px;color:#6b6b74;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Today</div>
+          ${timeSlots.map(s => `<div style="font-size:14px;color:#ececef;line-height:1.6">${s}</div>`).join("")}
+        </div>
+       </div>`
+    : "";
 
   const availabilityColor =
     loc.availabilityStatus?.toLowerCase().includes("waitlist") ? "#e07a5f"
     : loc.availabilityStatus?.toLowerCase().includes("available") ? "#81b29a"
     : "#a4a4ad";
 
-  const statusBadge = openToday
-    ? `<div style="display:inline-block;padding:2px 8px;border-radius:4px;background:#81b29a;color:#0e1a14;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">Open Today</div>`
-    : nextDate
-      ? `<div style="display:inline-block;padding:2px 8px;border-radius:4px;background:#1c1c22;border:1px solid rgba(236,236,239,0.15);color:#6b6b74;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">Next: ${escapeHtml(nextDate)}</div>`
-      : "";
-
-  const timeRow = time
-    ? `<div style="margin-bottom:6px;font-family:'Patrick Hand',sans-serif;font-size:15px;color:#ececef">${time}</div>`
-    : "";
-
   const availRow = loc.availabilityStatus
-    ? `<div style="margin-bottom:10px;font-family:'Patrick Hand',sans-serif;font-size:14px;color:${availabilityColor}">${escapeHtml(loc.availabilityStatus)}</div>`
+    ? `<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;font-size:13px;color:${availabilityColor}">
+        <span>📋</span><span>${escapeHtml(loc.availabilityStatus)}</span>
+       </div>`
     : "";
 
   const languages = loc.additionalLanguages.length
-    ? `<div style="margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6b6b74;text-transform:uppercase;letter-spacing:1px">${escapeHtml(loc.additionalLanguages.join(" · "))}</div>`
+    ? `<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;font-size:13px;color:#a4a4ad">
+        <span>🌍</span><span>${escapeHtml(loc.additionalLanguages.join(", "))}</span>
+       </div>`
     : "";
 
+  const isDaily = loc.distributionDay
+    ? ["daily", "every day", "monday-sunday", "monday - sunday"].includes(loc.distributionDay.toLowerCase())
+    : false;
+
+  const dayLabel = loc.distributionDay
+    ? isDaily
+      ? "Open every day"
+      : `Usually: ${escapeHtml(loc.distributionDay)}s`
+    : null;
+
+  const upcomingDates = loc.nextDistributionDates.slice(0, 5);
+  const scheduleRows = isDaily && timeSlots.length
+    ? timeSlots.map(s => `<div style="font-size:13px;color:#ececef;line-height:1.8">• ${s}</div>`).join("")
+    : upcomingDates.length
+      ? upcomingDates.map(d => `<div style="padding:3px 0;font-size:13px;color:#ececef;border-bottom:1px solid rgba(236,236,239,0.07)">📅 ${escapeHtml(d)}</div>`).join("")
+      : `<div style="font-size:13px;color:#6b6b74">No upcoming dates listed</div>`;
+
+  const scheduleDropdown = `
+    <details style="margin-bottom:10px">
+      <summary style="cursor:pointer;font-size:13px;color:#a4a4ad;user-select:none;padding:4px 0;list-style:none;display:flex;align-items:center;gap:4px">
+        🗓️ <span>View Schedule</span>
+      </summary>
+      <div style="margin-top:6px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:6px;border:1px solid rgba(236,236,239,0.1)">
+        ${dayLabel ? `<div style="font-size:12px;color:#6b6b74;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">${dayLabel}</div>` : ""}
+        ${scheduleRows}
+      </div>
+    </details>`;
+
   return `
-    <div style="min-width:260px;max-width:300px;padding:10px 14px 12px;background:#16161a;color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif">
-      ${statusBadge}
-      <div style="margin:0 0 4px;font-family:'Patrick Hand',sans-serif;font-size:19px;line-height:1.2;color:#ececef">${title}</div>
-      <div style="margin:0 0 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6b6b74;line-height:1.4">${address}</div>
+    <div style="min-width:260px;max-width:300px;padding:12px 14px 12px;background:#16161a;color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif;position:relative">
+      <button onclick="window.__closeInfoWindow()" style="position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;color:#6b6b74;font-size:18px;line-height:1;padding:0;margin:0" aria-label="Close">✕</button>
+      <div style="margin-bottom:10px;padding-right:24px">
+        ${openBadge.replace(' style="', ' style="margin-bottom:0;')}
+      </div>
+      <div style="margin:0 0 4px;font-size:19px;line-height:1.2;color:#ececef;font-weight:600">${title}</div>
+      <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:10px;font-size:12px;color:#6b6b74;line-height:1.4">
+        <span>📍</span><span>${address}</span>
+      </div>
       ${timeRow}
       ${availRow}
       ${languages}
+      ${scheduleDropdown}
       <div style="display:flex;flex-wrap:wrap;gap:6px;padding-top:10px;border-top:1px dashed rgba(236,236,239,0.15)">
         <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer"
-          style="display:inline-flex;align-items:center;padding:8px 14px;border-radius:6px;background:#f3a64a;color:#1a1208;text-decoration:none;font-family:'Patrick Hand',sans-serif;font-size:14px">
-          Directions →
+          style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:6px;background:#f3a64a;color:#1a1208;text-decoration:none;font-size:14px;font-weight:600">
+          🗺️ Directions
         </a>
         ${siteUrl ? `
           <a href="${escapeHtml(siteUrl)}" target="_blank" rel="noopener noreferrer"
-            style="display:inline-flex;align-items:center;padding:8px 14px;border-radius:6px;background:transparent;border:1px dashed rgba(236,236,239,0.22);color:#a4a4ad;text-decoration:none;font-family:'Patrick Hand',sans-serif;font-size:14px">
-            Website ↗
+            style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:6px;background:transparent;border:1px dashed rgba(236,236,239,0.22);color:#a4a4ad;text-decoration:none;font-size:14px">
+            🌐 Website
           </a>
         ` : ""}
       </div>
@@ -173,9 +221,8 @@ export function GoogleMapView({ locations }: Props) {
             .gm-style .gm-style-iw-t::after {
               background: linear-gradient(45deg, #16161a 50%, rgba(0,0,0,0) 51%) !important;
             }
-            .gm-style .gm-style-iw button[title="Close"] {
-              opacity: 0.5 !important;
-              filter: invert(1) !important;
+            .gm-style .gm-style-iw-chr {
+              display: none !important;
             }
           `;
           document.head.appendChild(style);
@@ -213,6 +260,10 @@ export function GoogleMapView({ locations }: Props) {
         });
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
+        (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
+          openWindow?.close();
+          openWindow = null;
+        };
         const mappableLocations = locations.filter(hasCoordinates);
 
         // Tapping the map (outside any marker) dismisses the open popup.
