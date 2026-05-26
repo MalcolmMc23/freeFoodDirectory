@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { Location } from "../lib/types";
@@ -23,6 +24,14 @@ export function HomePageClient({ locations }: Props) {
 
   return (
     <main className={styles.landing}>
+      <Image
+        src="/assets/logo_1.png"
+        alt="Free Food Maps logo"
+        width={120}
+        height={120}
+        className={styles.logo}
+        priority
+      />
       <h1 className={styles.title}>Free Food Directory</h1>
       <button className={styles.button} onClick={() => setShowMap(true)}>
         Show Map

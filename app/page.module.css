@@ -1,3 +1,9 @@
+.logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
 .landing {
   display: flex;
   flex-direction: column;
