@@ -5,12 +5,12 @@ import "./globals.css";
 const SITE_URL = "https://freefoodmaps.com";
 const SITE_NAME = "Free Food Maps";
 const DESCRIPTION =
-  "Find free food near you in San Francisco. No ID, no questions. Walk in. Updated daily from local food banks, pantries, and community kitchens.";
+  "Find free food in San Francisco. Food banks, soup kitchens, and community pantries — no ID, no questions. Updated weekly.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Free Food Maps · San Francisco",
+    default: "Free Food in San Francisco | Food Banks, Soup Kitchens & Pantries",
     template: "%s | Free Food Maps SF",
   },
   description: DESCRIPTION,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "Free Food Maps · San Francisco",
+    title: "Free Food in San Francisco | Food Banks, Soup Kitchens & Pantries",
     description: DESCRIPTION,
     locale: "en_US",
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Food Maps · San Francisco",
+    title: "Free Food in San Francisco | Food Banks, Soup Kitchens & Pantries",
     description: DESCRIPTION,
     images: ["/opengraph-image"],
   },
