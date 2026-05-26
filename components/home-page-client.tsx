@@ -34,7 +34,7 @@ export function HomePageClient({ locations, locationList }: Props) {
           className={styles.logo}
           priority
         />
-        <h1 className={styles.title}>Find Free Food in San Francisco</h1>
+        <h1 className={styles.title}>Find Free Food</h1>
         <button className={styles.button} onClick={() => setShowMap(true)}>
           Show Map
         </button>
