@@ -25,7 +25,7 @@ export function HomePageClient({ locations }: Props) {
   return (
     <main className={styles.landing}>
       <Image
-        src="/assets/logo_1.png"
+        src="/assets/logo_transparent_background.png"
         alt="Free Food Maps logo"
         width={120}
         height={120}
