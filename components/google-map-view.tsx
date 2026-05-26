@@ -61,22 +61,54 @@ const loadGoogleMaps = async (apiKey: string) => {
   return window.__googleMapsLoader;
 };
 
-function getTodayName(): string {
-  return new Date().toLocaleDateString("en-US", { weekday: "long" });
+function getTodayNameSF(): string {
+  return new Date().toLocaleDateString("en-US", { weekday: "long", timeZone: "America/Los_Angeles" });
 }
 
-function isOpenToday(loc: Location): boolean {
+function getCurrentMinutesSF(): number {
+  const sfTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+  return sfTime.getHours() * 60 + sfTime.getMinutes();
+}
+
+function parseTimeToMinutes(t: string): number | null {
+  const m = t.trim().match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i);
+  if (!m) return null;
+  let h = parseInt(m[1]);
+  const min = parseInt(m[2]);
+  const period = m[3].toLowerCase();
+  if (period === "pm" && h !== 12) h += 12;
+  if (period === "am" && h === 12) h = 0;
+  return h * 60 + min;
+}
+
+function isCurrentlyOpen(loc: Location): boolean {
   if (!loc.distributionDay) return false;
   const day = loc.distributionDay.toLowerCase();
-  if (day === "daily" || day === "every day" || day === "monday-sunday" || day === "monday - sunday") return true;
-  return day === getTodayName().toLowerCase();
+  const isEveryDay = day === "daily" || day === "every day" || day === "monday-sunday" || day === "monday - sunday";
+  if (!isEveryDay && day !== getTodayNameSF().toLowerCase()) return false;
+
+  if (!loc.distributionTimeText) return true;
+
+  const now = getCurrentMinutesSF();
+  // Normalize en-dash (–) and non-breaking hyphen (‐) to regular hyphen
+  const normalized = loc.distributionTimeText.replace(/[–‐]/g, "-");
+  const slots = normalized.split(",");
+  for (const slot of slots) {
+    const parts = slot.trim().split(/\s*-\s*/);
+    if (parts.length >= 2) {
+      const start = parseTimeToMinutes(parts[0]);
+      const end = parseTimeToMinutes(parts[parts.length - 1]);
+      if (start !== null && end !== null && now >= start && now < end) return true;
+    }
+  }
+  return false;
 }
 
 function infoWindowContent(loc: Location): string {
   const title = escapeHtml(loc.name);
   const address = escapeHtml(formatLocationAddress(loc));
   const time = loc.distributionTimeText ? escapeHtml(loc.distributionTimeText) : "";
-  const openToday = isOpenToday(loc);
+  const openToday = isCurrentlyOpen(loc);
   const directionsUrl = googleMapsDirectionsUrl(loc);
   const siteUrl = loc.siteUrl ?? loc.sourceUrl;
 
@@ -300,7 +332,7 @@ export function GoogleMapView({ locations }: Props) {
         });
 
         for (const loc of mappableLocations) {
-          const openNow = isOpenToday(loc);
+          const openNow = isCurrentlyOpen(loc);
           const marker = new Marker({
             map,
             position: { lat: loc.lat, lng: loc.lng },
