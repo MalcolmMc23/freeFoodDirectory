@@ -1,0 +1,45 @@
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.back {
+  font-family: var(--hand);
+  font-size: 14px;
+  color: var(--ink-mute);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+.back:hover {
+  color: var(--ink-dim);
+}
+
+.heading {
+  font-family: var(--hand);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.sub {
+  font-family: var(--hand);
+  font-size: 15px;
+  color: var(--ink-dim);
+  margin: 0 0 32px;
+}
+
+.empty {
+  font-family: var(--hand);
+  font-size: 15px;
+  color: var(--ink-dim);
+  margin-top: 32px;
+}
+
+.empty a {
+  color: var(--accent);
+  text-decoration: none;
+}

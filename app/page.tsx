@@ -1,4 +1,5 @@
 import { HomePageClient } from "../components/home-page-client";
+import { LocationList } from "../components/location-list";
 import { getLocations } from "../lib/locations";
 import { formatLocationAddress } from "../lib/types";
 
@@ -66,7 +67,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HomePageClient locations={locations} />
+      <HomePageClient locations={locations} locationList={<LocationList locations={locations} />} />
     </>
   );
 }

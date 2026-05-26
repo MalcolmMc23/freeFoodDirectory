@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SF_NEIGHBORHOODS } from "../lib/neighborhoods";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -14,5 +15,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    {
+      url: "https://freefoodmaps.com/sources",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    ...SF_NEIGHBORHOODS.map((n) => ({
+      url: `https://freefoodmaps.com/neighborhood/${n.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
   ];
 }

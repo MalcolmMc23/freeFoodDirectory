@@ -1,3 +1,8 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
 .logo {
   width: 120px;
   height: 120px;
@@ -9,9 +14,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   gap: 24px;
-  background: var(--bg);
+  padding: 40px 20px;
 }
 
 .title {
@@ -22,6 +27,7 @@
   color: var(--ink);
   margin: 0;
   text-align: center;
+  max-width: 520px;
 }
 
 .button {
@@ -39,6 +45,18 @@
 
 .button:hover {
   opacity: 0.88;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.linkDivider {
+  color: var(--ink-mute);
+  font-family: var(--hand);
+  font-size: 14px;
 }
 
 .faqLink {
