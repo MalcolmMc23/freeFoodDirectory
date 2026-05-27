@@ -5,7 +5,12 @@ import { formatLocationAddress, type Location } from "../lib/types";
 import styles from "./google-map-view.module.css";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-const SAN_FRANCISCO = { lat: 37.7749, lng: -122.4194 };
+
+export type LatLng = { lat: number; lng: number };
+
+export const SAN_FRANCISCO: LatLng = { lat: 37.7749, lng: -122.4194 };
+export const LOS_ANGELES: LatLng = { lat: 34.0522, lng: -118.2437 };
+
 const SF_BOUNDS = { north: 37.970, south: 37.660, west: -122.560, east: -122.300 };
 const CA_BOUNDS = { north: 42.1, south: 32.5, west: -124.5, east: -113.9 };
 
@@ -225,9 +230,13 @@ function googleMapsDirectionsUrl(loc: Location): string {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-type Props = { locations: Location[] };
+type Props = {
+  locations: Location[];
+  /** Where the map first centers. Map is shared — user can pan to either city. */
+  initialCenter?: LatLng;
+};
 
-export function GoogleMapView({ locations }: Props) {
+export function GoogleMapView({ locations, initialCenter = SAN_FRANCISCO }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -273,7 +282,7 @@ export function GoogleMapView({ locations }: Props) {
         }
 
         const map = new Map(mapRef.current, {
-          center: SAN_FRANCISCO,
+          center: initialCenter,
           zoom: 13,
           mapTypeId: "roadmap",
           streetViewControl: false,
@@ -370,7 +379,7 @@ export function GoogleMapView({ locations }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [locations]);
+  }, [locations, initialCenter]);
 
   return (
     <section className={styles.page}>

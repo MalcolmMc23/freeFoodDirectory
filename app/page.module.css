@@ -30,6 +30,13 @@
   max-width: 520px;
 }
 
+.buttonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
 .button {
   font-family: var(--hand);
   font-size: 16px;
@@ -44,6 +51,23 @@
 }
 
 .button:hover {
+  opacity: 0.88;
+}
+
+.buttonLa {
+  font-family: var(--hand);
+  font-size: 16px;
+  font-weight: 400;
+  padding: 10px 16px;
+  background: var(--accent-la);
+  color: var(--accent-la-ink);
+  border: 1.5px solid var(--accent-la);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 120ms ease-out;
+}
+
+.buttonLa:hover {
   opacity: 0.88;
 }
 

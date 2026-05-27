@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { Location } from "../lib/types";
-import { GoogleMapView } from "./google-map-view";
+import { GoogleMapView, SAN_FRANCISCO, LOS_ANGELES, type LatLng } from "./google-map-view";
 import styles from "../app/page.module.css";
 
 type Props = {
@@ -13,12 +13,13 @@ type Props = {
 };
 
 export function HomePageClient({ locations, locationList }: Props) {
-  const [showMap, setShowMap] = useState(false);
+  // null = landing; otherwise holds the initial center for the (single, shared) map.
+  const [mapCenter, setMapCenter] = useState<LatLng | null>(null);
 
-  if (showMap) {
+  if (mapCenter) {
     return (
       <main style={{ height: "100vh" }}>
-        <GoogleMapView locations={locations} />
+        <GoogleMapView locations={locations} initialCenter={mapCenter} />
       </main>
     );
   }
@@ -35,9 +36,14 @@ export function HomePageClient({ locations, locationList }: Props) {
           priority
         />
         <h1 className={styles.title}>Find Free Food</h1>
-        <button className={styles.button} onClick={() => setShowMap(true)}>
-          Show Map
-        </button>
+        <div className={styles.buttonGroup}>
+          <button className={styles.button} onClick={() => setMapCenter(SAN_FRANCISCO)}>
+            Show Map SF
+          </button>
+          <button className={styles.buttonLa} onClick={() => setMapCenter(LOS_ANGELES)}>
+            Show Map LA
+          </button>
+        </div>
         <div className={styles.links}>
           <Link href="/faq" className={styles.faqLink}>FAQ</Link>
           <span className={styles.linkDivider}>·</span>
