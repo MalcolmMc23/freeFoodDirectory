@@ -21,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    {
+      url: "https://freefoodmaps.com/automations",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
     ...SF_NEIGHBORHOODS.map((n) => ({
       url: `https://freefoodmaps.com/neighborhood/${n.slug}`,
       lastModified: new Date(),

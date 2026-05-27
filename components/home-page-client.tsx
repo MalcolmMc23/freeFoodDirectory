@@ -42,6 +42,8 @@ export function HomePageClient({ locations, locationList }: Props) {
           <Link href="/faq" className={styles.faqLink}>FAQ</Link>
           <span className={styles.linkDivider}>·</span>
           <Link href="/sources" className={styles.faqLink}>Sources</Link>
+          <span className={styles.linkDivider}>·</span>
+          <Link href="/automations" className={styles.faqLink}>Automations</Link>
         </div>
       </section>
       {locationList}
