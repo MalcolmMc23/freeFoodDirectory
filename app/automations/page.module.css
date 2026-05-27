@@ -1,0 +1,84 @@
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.back {
+  font-family: var(--hand);
+  font-size: 14px;
+  color: var(--ink-mute);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+.back:hover {
+  color: var(--ink-dim);
+}
+
+.heading {
+  font-family: var(--hand);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+
+.intro {
+  font-family: var(--hand);
+  font-size: 15px;
+  color: var(--ink-dim);
+  margin: 0 0 32px;
+  line-height: 1.6;
+}
+
+.intro a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  border: 1px solid var(--stroke);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.task {
+  font-family: var(--hand);
+  font-size: 16px;
+  color: var(--accent);
+  margin: 0 0 6px;
+}
+
+.description {
+  font-family: var(--hand);
+  font-size: 14px;
+  color: var(--ink-dim);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.disclaimer {
+  font-family: var(--hand);
+  font-size: 14px;
+  color: var(--ink-mute);
+  margin-top: 40px;
+  border-top: 1px solid var(--stroke);
+  padding-top: 20px;
+  line-height: 1.5;
+}
+
+.disclaimer a {
+  color: var(--accent);
+  text-decoration: none;
+}
