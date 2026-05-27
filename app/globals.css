@@ -16,6 +16,9 @@
 
   --accent: #f3a64a;
   --accent-ink: #1a1208;
+  /* LA accent: same vibrancy as --accent (gold), shifted to baby-blue hue. */
+  --accent-la: #5fb6ec;
+  --accent-la-ink: #061522;
   --open: #6fc78a;
   --closed: #e07676;
   --info: #7fb6e6;
