@@ -14,6 +14,15 @@ export const LOS_ANGELES: LatLng = { lat: 34.0522, lng: -118.2437 };
 const SF_BOUNDS = { north: 37.970, south: 37.660, west: -122.560, east: -122.300 };
 const CA_BOUNDS = { north: 42.1, south: 32.5, west: -124.5, east: -113.9 };
 
+type GoogleMapsDataLayer = {
+  loadGeoJson: (url: string) => void;
+  setStyle: (style: object) => void;
+  overrideStyle: (feature: object, style: object) => void;
+  revertStyle: () => void;
+  addListener: (event: string, cb: (e: { feature: object }) => void) => void;
+  setMap: (map: object | null) => void;
+};
+
 declare global {
   interface Window {
     __googleMapsInit?: () => void;
@@ -23,13 +32,7 @@ declare global {
         Map: new (el: HTMLElement, opts: object) => {
           addListener: (event: string, cb: () => void) => void;
           getZoom: () => number;
-          data: {
-            loadGeoJson: (url: string) => void;
-            setStyle: (style: object) => void;
-            overrideStyle: (feature: object, style: object) => void;
-            revertStyle: () => void;
-            addListener: (event: string, cb: (e: { feature: object }) => void) => void;
-          };
+          data: GoogleMapsDataLayer;
         };
         Marker: new (opts: { map: object; position: { lat: number; lng: number }; title?: string; icon?: object | string; clickable?: boolean }) => {
           addListener: (event: string, cb: () => void) => void;
@@ -40,6 +43,7 @@ declare global {
           close: () => void;
         };
         Polygon: new (opts: object) => object;
+        Data: new (opts: { map: object }) => GoogleMapsDataLayer;
       };
     };
   }
@@ -230,6 +234,28 @@ function googleMapsDirectionsUrl(loc: Location): string {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
+/** Attach a neighborhood GeoJSON to a Data layer, invisible until hovered. */
+function addNeighborhoodOverlay(
+  layer: GoogleMapsDataLayer,
+  geojsonUrl: string,
+  hoverColor: string,
+): void {
+  layer.loadGeoJson(geojsonUrl);
+  layer.setStyle({ strokeOpacity: 0, fillOpacity: 0 });
+  layer.addListener("mouseover", (e) => {
+    layer.overrideStyle(e.feature, {
+      strokeColor: hoverColor,
+      strokeWeight: 3,
+      strokeOpacity: 1,
+      fillColor: hoverColor,
+      fillOpacity: 0.08,
+    });
+  });
+  layer.addListener("mouseout", () => {
+    layer.revertStyle();
+  });
+}
+
 type Props = {
   locations: Location[];
   /** Where the map first centers. Map is shared — user can pan to either city. */
@@ -254,7 +280,7 @@ export function GoogleMapView({ locations, initialCenter = SAN_FRANCISCO }: Prop
 
         if (cancelled || !mapRef.current || !window.google?.maps) return;
 
-        const { Map, Marker, InfoWindow } = window.google.maps;
+        const { Map, Marker, InfoWindow, Data } = window.google.maps;
 
         // Inject CSS to dark-theme the Google Maps InfoWindow chrome
         if (!document.getElementById("gm-iw-dark")) {
@@ -312,21 +338,10 @@ export function GoogleMapView({ locations, initialCenter = SAN_FRANCISCO }: Prop
           ],
         });
 
-        // Neighborhood outlines: invisible by default, gold stroke on hover.
-        map.data.loadGeoJson("/sf-neighborhoods.geojson");
-        map.data.setStyle({ strokeOpacity: 0, fillOpacity: 0 });
-        map.data.addListener("mouseover", (e) => {
-          map.data.overrideStyle(e.feature, {
-            strokeColor: "#f3a64a",
-            strokeWeight: 3,
-            strokeOpacity: 1,
-            fillColor: "#f3a64a",
-            fillOpacity: 0.08,
-          });
-        });
-        map.data.addListener("mouseout", () => {
-          map.data.revertStyle();
-        });
+        // Two neighborhood overlays on the same map — each city keeps its own
+        // hover color. Invisible by default; only outlines on hover.
+        addNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson", "#f3a64a");
+        addNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "#5fb6ec");
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {

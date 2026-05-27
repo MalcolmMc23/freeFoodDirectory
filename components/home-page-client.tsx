@@ -38,10 +38,10 @@ export function HomePageClient({ locations, locationList }: Props) {
         <h1 className={styles.title}>Find Free Food</h1>
         <div className={styles.buttonGroup}>
           <button className={styles.button} onClick={() => setMapCenter(SAN_FRANCISCO)}>
-            Show Map SF
+            Show SF Map
           </button>
           <button className={styles.buttonLa} onClick={() => setMapCenter(LOS_ANGELES)}>
-            Show Map LA
+            Show LA Map
           </button>
         </div>
         <div className={styles.links}>
