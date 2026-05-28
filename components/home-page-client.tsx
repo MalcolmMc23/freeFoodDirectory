@@ -12,14 +12,23 @@ type Props = {
   locationList: React.ReactNode;
 };
 
-export function HomePageClient({ locations, locationList }: Props) {
-  // null = landing; otherwise holds the initial center for the (single, shared) map.
-  const [mapCenter, setMapCenter] = useState<LatLng | null>(null);
+// LA covers a much larger area than SF, so start zoomed out enough to
+// include South LA / Compton sites alongside downtown.
+const SF_INITIAL_ZOOM = 13;
+const LA_INITIAL_ZOOM = 11;
 
-  if (mapCenter) {
+export function HomePageClient({ locations, locationList }: Props) {
+  // null = landing; otherwise holds the initial center + zoom for the (shared) map.
+  const [mapView, setMapView] = useState<{ center: LatLng; zoom: number } | null>(null);
+
+  if (mapView) {
     return (
       <main style={{ height: "100vh" }}>
-        <GoogleMapView locations={locations} initialCenter={mapCenter} />
+        <GoogleMapView
+          locations={locations}
+          initialCenter={mapView.center}
+          initialZoom={mapView.zoom}
+        />
       </main>
     );
   }
@@ -37,10 +46,16 @@ export function HomePageClient({ locations, locationList }: Props) {
         />
         <h1 className={styles.title}>Find Free Food</h1>
         <div className={styles.buttonGroup}>
-          <button className={styles.button} onClick={() => setMapCenter(SAN_FRANCISCO)}>
+          <button
+            className={styles.button}
+            onClick={() => setMapView({ center: SAN_FRANCISCO, zoom: SF_INITIAL_ZOOM })}
+          >
             Show SF Map
           </button>
-          <button className={styles.buttonLa} onClick={() => setMapCenter(LOS_ANGELES)}>
+          <button
+            className={styles.buttonLa}
+            onClick={() => setMapView({ center: LOS_ANGELES, zoom: LA_INITIAL_ZOOM })}
+          >
             Show LA Map
           </button>
         </div>
