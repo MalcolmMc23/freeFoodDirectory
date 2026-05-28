@@ -14,6 +14,21 @@ export const LOS_ANGELES: LatLng = { lat: 34.0522, lng: -118.2437 };
 const SF_BOUNDS = { north: 37.970, south: 37.660, west: -122.560, east: -122.300 };
 const CA_BOUNDS = { north: 42.1, south: 32.5, west: -124.5, east: -113.9 };
 
+// Pin palette per city, matched to the "Show SF/LA Map" buttons.
+// Open-now stays green everywhere — universal "good to go" signal.
+const PIN_OPEN = { fill: "#81b29a", stroke: "#4a8c6f" } as const;
+const PIN_SF_CLOSED = { fill: "#f3a64a", stroke: "#c47d28" } as const;
+const PIN_LA_CLOSED = { fill: "#5fb6ec", stroke: "#3a8ec4" } as const;
+
+// Anything south of ~36°N is treated as the LA region.
+const LA_REGION_MAX_LAT = 36;
+
+function pinPalette(loc: Location, openNow: boolean): { fill: string; stroke: string } {
+  if (openNow) return PIN_OPEN;
+  const isLA = typeof loc.lat === "number" && loc.lat < LA_REGION_MAX_LAT;
+  return isLA ? PIN_LA_CLOSED : PIN_SF_CLOSED;
+}
+
 type GoogleMapsDataLayer = {
   loadGeoJson: (url: string) => void;
   setStyle: (style: object) => void;
@@ -363,15 +378,16 @@ export function GoogleMapView({
 
         for (const loc of mappableLocations) {
           const openNow = isCurrentlyOpen(loc);
+          const palette = pinPalette(loc, openNow);
           const marker = new Marker({
             map,
             position: { lat: loc.lat, lng: loc.lng },
             title: loc.name,
             icon: {
               path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z",
-              fillColor: openNow ? "#81b29a" : "#f3a64a",
+              fillColor: palette.fill,
               fillOpacity: 1,
-              strokeColor: openNow ? "#4a8c6f" : "#c47d28",
+              strokeColor: palette.stroke,
               strokeWeight: 1.5,
               scale: 1.6,
               anchor: { x: 12, y: 24 },
