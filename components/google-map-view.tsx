@@ -260,9 +260,15 @@ type Props = {
   locations: Location[];
   /** Where the map first centers. Map is shared — user can pan to either city. */
   initialCenter?: LatLng;
+  /** Initial zoom level. LA needs a wider view (11) than SF (13). */
+  initialZoom?: number;
 };
 
-export function GoogleMapView({ locations, initialCenter = SAN_FRANCISCO }: Props) {
+export function GoogleMapView({
+  locations,
+  initialCenter = SAN_FRANCISCO,
+  initialZoom = 13,
+}: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -309,7 +315,7 @@ export function GoogleMapView({ locations, initialCenter = SAN_FRANCISCO }: Prop
 
         const map = new Map(mapRef.current, {
           center: initialCenter,
-          zoom: 13,
+          zoom: initialZoom,
           mapTypeId: "roadmap",
           streetViewControl: false,
           mapTypeControl: false,
@@ -394,7 +400,7 @@ export function GoogleMapView({ locations, initialCenter = SAN_FRANCISCO }: Prop
     return () => {
       cancelled = true;
     };
-  }, [locations, initialCenter]);
+  }, [locations, initialCenter, initialZoom]);
 
   return (
     <section className={styles.page}>

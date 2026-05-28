@@ -3,6 +3,11 @@ import { LocationList } from "../components/location-list";
 import { getLocations } from "../lib/locations";
 import { formatLocationAddress } from "../lib/types";
 
+// Refresh Supabase-backed data at most every 60s so rows added to the DB
+// appear without a redeploy. Without this, the page is statically built
+// and Supabase rows are frozen at build time.
+export const revalidate = 60;
+
 export default async function HomePage() {
   const locations = await getLocations();
 
