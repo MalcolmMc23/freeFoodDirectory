@@ -10,6 +10,37 @@
   height: 100%;
 }
 
+.filterBar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+}
+
+.filterLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background: rgba(14, 14, 16, 0.88);
+  border: 1.5px dashed rgba(236, 236, 239, 0.22);
+  border-radius: 6px;
+  color: var(--ink);
+  font-family: var(--hand);
+  font-size: 15px;
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(4px);
+}
+
+.filterLabel input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #6fc78a;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 .error {
   position: absolute;
   top: 16px;

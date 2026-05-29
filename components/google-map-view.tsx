@@ -271,6 +271,13 @@ function addNeighborhoodOverlay(
   });
 }
 
+type MarkerEntry = {
+  marker: ReturnType<typeof window.google.maps.Marker["prototype"]["constructor"]> & {
+    setMap: (map: object | null) => void;
+  };
+  openNow: boolean;
+};
+
 type Props = {
   locations: Location[];
   /** Where the map first centers. Map is shared — user can pan to either city. */
@@ -285,7 +292,13 @@ export function GoogleMapView({
   initialZoom = 13,
 }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<ReturnType<typeof window.google.maps.Map["prototype"]["constructor"]> & {
+    addListener: (event: string, cb: () => void) => void;
+    data: GoogleMapsDataLayer;
+  } | null>(null);
+  const markersRef = useRef<MarkerEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [filterOpenOnly, setFilterOpenOnly] = useState(false);
 
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
@@ -359,6 +372,8 @@ export function GoogleMapView({
           ],
         });
 
+        mapInstanceRef.current = map as typeof mapInstanceRef.current;
+
         // Two neighborhood overlays on the same map — each city keeps its own
         // hover color. Invisible by default; only outlines on hover.
         addNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson", "#f3a64a");
@@ -376,6 +391,7 @@ export function GoogleMapView({
           openWindow = null;
         });
 
+        const entries: MarkerEntry[] = [];
         for (const loc of mappableLocations) {
           const openNow = isCurrentlyOpen(loc);
           const palette = pinPalette(loc, openNow);
@@ -403,7 +419,10 @@ export function GoogleMapView({
             infoWindow.open({ anchor: marker, map });
             openWindow = infoWindow;
           });
+
+          entries.push({ marker: marker as MarkerEntry["marker"], openNow });
         }
+        markersRef.current = entries;
       } catch {
         if (!cancelled) {
           setError("Google Maps could not load. Check the API key and allowed referrers.");
@@ -418,9 +437,28 @@ export function GoogleMapView({
     };
   }, [locations, initialCenter, initialZoom]);
 
+  // Toggle marker visibility when filter changes — no map re-init needed.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    for (const { marker, openNow } of markersRef.current) {
+      marker.setMap(filterOpenOnly && !openNow ? null : map);
+    }
+  }, [filterOpenOnly]);
+
   return (
     <section className={styles.page}>
       <div ref={mapRef} className={styles.map} />
+      <div className={styles.filterBar}>
+        <label className={styles.filterLabel}>
+          <input
+            type="checkbox"
+            checked={filterOpenOnly}
+            onChange={(e) => setFilterOpenOnly(e.target.checked)}
+          />
+          Open now
+        </label>
+      </div>
       {error ? <div className={styles.error}>{error}</div> : null}
     </section>
   );
