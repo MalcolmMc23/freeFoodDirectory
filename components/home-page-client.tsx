@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Location } from "../lib/types";
 import { GoogleMapView, SAN_FRANCISCO, LOS_ANGELES, type LatLng } from "./google-map-view";
+import { CommunityNotesHost } from "./community-notes/CommunityNotesPanel";
 import styles from "../app/page.module.css";
 
 type Props = {
@@ -29,6 +30,7 @@ export function HomePageClient({ locations, locationList }: Props) {
           initialCenter={mapView.center}
           initialZoom={mapView.zoom}
         />
+        <CommunityNotesHost />
       </main>
     );
   }

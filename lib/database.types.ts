@@ -11,6 +11,7 @@ export type Database = {
           display_name: string;
           ip_hash: string;
           flag_count: number;
+          helpful_count: number;
           is_visible: boolean;
           created_at: string;
         };
@@ -21,6 +22,7 @@ export type Database = {
           display_name?: string;
           ip_hash: string;
           flag_count?: number;
+          helpful_count?: number;
           is_visible?: boolean;
           created_at?: string;
         };
@@ -31,6 +33,7 @@ export type Database = {
           display_name?: string;
           ip_hash?: string;
           flag_count?: number;
+          helpful_count?: number;
           is_visible?: boolean;
           created_at?: string;
         };
@@ -174,7 +177,12 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      increment_helpful: {
+        Args: { comment_id: string };
+        Returns: undefined;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

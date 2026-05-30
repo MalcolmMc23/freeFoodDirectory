@@ -30,6 +30,7 @@ const MOCK_COMMENT = {
   location_id: "loc-uuid-1",
   comment_text: "They had lots of produce today",
   display_name: "A visitor",
+  helpful_count: 0,
   flag_count: 0,
   is_visible: true,
   created_at: "2026-05-30T12:00:00Z",
