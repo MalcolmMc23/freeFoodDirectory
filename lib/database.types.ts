@@ -3,6 +3,47 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      location_comments: {
+        Row: {
+          id: string;
+          location_id: string;
+          comment_text: string;
+          display_name: string;
+          ip_hash: string;
+          flag_count: number;
+          is_visible: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          comment_text: string;
+          display_name?: string;
+          ip_hash: string;
+          flag_count?: number;
+          is_visible?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          location_id?: string;
+          comment_text?: string;
+          display_name?: string;
+          ip_hash?: string;
+          flag_count?: number;
+          is_visible?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "location_comments_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "locations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       locations: {
         Row: {
           id: string;
