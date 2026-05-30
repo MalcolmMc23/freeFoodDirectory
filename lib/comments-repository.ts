@@ -6,6 +6,7 @@ export interface Comment {
   location_id: string;
   comment_text: string;
   display_name: string;
+  helpful_count: number;
   flag_count: number;
   is_visible: boolean;
   created_at: string;
@@ -17,7 +18,7 @@ export async function getComments(locationId: string): Promise<Comment[]> {
 
   const { data, error } = await supabase
     .from("location_comments")
-    .select("id, location_id, comment_text, display_name, created_at")
+    .select("id, location_id, comment_text, display_name, helpful_count, created_at")
     .eq("location_id", locationId)
     .eq("is_visible", true)
     .order("created_at", { ascending: false })
@@ -87,4 +88,17 @@ export async function flagComment(
 
   if (error) throw error;
   return data as { flag_count: number; is_visible: boolean };
+}
+
+export async function incrementHelpful(id: string): Promise<void> {
+  const supabase = createAdminSupabaseClient();
+  if (!supabase) throw new Error("Database unavailable");
+
+  const { error } = await supabase.rpc("increment_helpful", { comment_id: id });
+  if (error) {
+    if (error.code === "PGRST116" || error.message?.includes("not found")) {
+      throw new Error("Comment not found");
+    }
+    throw error;
+  }
 }

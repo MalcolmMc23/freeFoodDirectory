@@ -42,6 +42,7 @@ declare global {
   interface Window {
     __googleMapsInit?: () => void;
     __googleMapsLoader?: Promise<void>;
+    openCommunityNotes?: (locationId: string, name: string) => void;
     google: {
       maps: {
         Map: new (el: HTMLElement, opts: object) => {
@@ -204,6 +205,14 @@ function infoWindowContent(loc: Location): string {
     ? `<a href="tel:${escapeHtml(loc.phone)}" style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:12px;color:#a4a4ad;text-decoration:none"><span>📞</span><span>${escapeHtml(loc.phone)}</span></a>`
     : "";
 
+  const escapedName = escapeHtml(loc.name).replace(/'/g, "\\'");
+  const communityNotesButton = `
+    <button
+      onclick="window.openCommunityNotes('${loc.id}','${escapedName}')"
+      style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 4px;margin-top:4px;background:transparent;border:0;border-top:1px dashed rgba(236,236,239,0.15);color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif;font-size:16px;cursor:pointer;text-align:left">
+      <span>💬</span><span style="flex:1">Community notes</span><span style="font-size:13px">→</span>
+    </button>`;
+
   return `
     <div style="min-width:260px;max-width:300px;padding:12px 14px 12px;background:#16161a;color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif;position:relative">
       <button onclick="window.__closeInfoWindow()" style="position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;color:#6b6b74;font-size:18px;line-height:1;padding:0;margin:0" aria-label="Close">✕</button>
@@ -219,6 +228,7 @@ function infoWindowContent(loc: Location): string {
       ${availRow}
       ${languages}
       ${scheduleDropdown}
+      ${communityNotesButton}
       <div style="display:flex;flex-wrap:wrap;gap:6px;padding-top:10px;border-top:1px dashed rgba(236,236,239,0.15)">
         <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer"
           style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:6px;background:#f3a64a;color:#1a1208;text-decoration:none;font-size:14px;font-weight:600">
