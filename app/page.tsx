@@ -18,9 +18,26 @@ export default async function HomePage() {
         "@type": "Organization",
         "@id": "https://freefoodmaps.com/#organization",
         name: "Free Food Maps",
+        alternateName: "freefoodmaps.com",
         url: "https://freefoodmaps.com",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://freefoodmaps.com/assets/logo_transparent_background.png",
+        },
         description:
-          "A directory of free food distribution locations in San Francisco. No ID, no questions required.",
+          "A free, open directory of food banks, soup kitchens, pantries, and community kitchens in San Francisco and Los Angeles. No ID required, no questions asked. Updated weekly.",
+        areaServed: [
+          { "@type": "City", name: "San Francisco", sameAs: "https://www.wikidata.org/wiki/Q62" },
+          { "@type": "City", name: "Los Angeles", sameAs: "https://www.wikidata.org/wiki/Q65" },
+        ],
+        sameAs: [
+          "https://freefoodmaps.com",
+        ],
+        contactPoint: {
+          "@type": "ContactPoint",
+          email: "malcolm.e.mcdonald@gmail.com",
+          contactType: "customer support",
+        },
       },
       {
         "@type": "WebSite",
