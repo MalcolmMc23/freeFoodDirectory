@@ -14,6 +14,7 @@ export type Note = {
 
 type Listener = () => void;
 
+const EMPTY_NOTES: Note[] = [];
 const cache = new Map<string, Note[]>();
 const listeners = new Map<string, Set<Listener>>();
 
@@ -22,7 +23,7 @@ function notify(locationId: string) {
 }
 
 function read(locationId: string): Note[] {
-  return cache.get(locationId) ?? [];
+  return cache.get(locationId) ?? EMPTY_NOTES;
 }
 
 function write(locationId: string, notes: Note[]) {

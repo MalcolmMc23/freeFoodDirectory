@@ -205,10 +205,10 @@ function infoWindowContent(loc: Location): string {
     ? `<a href="tel:${escapeHtml(loc.phone)}" style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:12px;color:#a4a4ad;text-decoration:none"><span>📞</span><span>${escapeHtml(loc.phone)}</span></a>`
     : "";
 
-  const escapedName = escapeHtml(loc.name).replace(/'/g, "\\'");
+  const nameJson = JSON.stringify(loc.name).replaceAll('"', '&quot;');
   const communityNotesButton = `
     <button
-      onclick="window.openCommunityNotes('${loc.id}','${escapedName}')"
+      onclick="window.openCommunityNotes('${loc.id}',${nameJson})"
       style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 4px;margin-top:4px;background:transparent;border:0;border-top:1px dashed rgba(236,236,239,0.15);color:#ececef;font-family:'Patrick Hand',system-ui,sans-serif;font-size:16px;cursor:pointer;text-align:left">
       <span>💬</span><span style="flex:1">Community notes</span><span style="font-size:13px">→</span>
     </button>`;
