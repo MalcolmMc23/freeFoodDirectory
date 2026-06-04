@@ -1,13 +1,11 @@
 <div align="center">
-  <img src="docs/brand-tagline.png" alt="Free Food Maps" width="300" />
+  <img src="docs/screenshot-browser.png" alt="Free Food Maps — browser view" width="700" />
   <br /><br />
   <p><strong>Find free food near you — no ID, no questions, no barriers.</strong></p>
   <p>
     <a href="https://freefoodmaps.com">freefoodmaps.com</a> &nbsp;·&nbsp;
     San Francisco &nbsp;·&nbsp; Los Angeles
   </p>
-  <br />
-  <img src="docs/screenshot-browser.png" alt="Free Food Maps — browser view" width="700" />
 </div>
 
 ---
