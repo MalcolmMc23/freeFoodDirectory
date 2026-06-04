@@ -13,7 +13,7 @@ export function LocationList({ locations }: Props) {
   );
 
   return (
-    <section className={styles.section} aria-label="All free food locations in San Francisco">
+    <section className={styles.section} aria-label="All free food locations in our system">
       {neighborhoodsWithLocations.length > 0 && (
         <div className={styles.neighborhoods}>
           <h2 className={styles.neighborhoodHeading}>Browse by neighborhood</h2>
@@ -29,7 +29,7 @@ export function LocationList({ locations }: Props) {
         </div>
       )}
       <h2 className={styles.heading}>
-        {locations.length} free food locations in San Francisco
+        {locations.length} free food locations in our system
       </h2>
       <ul className={styles.list}>
         {locations.map((loc) => {
