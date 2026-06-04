@@ -56,7 +56,7 @@ export default async function HomePage() {
       },
       {
         "@type": "ItemList",
-        name: "Free Food Locations in San Francisco",
+        name: "Free Food Locations in Free Food Maps",
         numberOfItems: locations.length,
         itemListElement: locations.map((loc, i) => ({
           "@type": "ListItem",

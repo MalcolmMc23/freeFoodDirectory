@@ -7,6 +7,14 @@
 
 .neighborhoods {
   margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.neighborhoodGroup {
+  display: flex;
+  flex-direction: column;
 }
 
 .neighborhoodHeading {
