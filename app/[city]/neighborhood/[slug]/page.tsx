@@ -1,32 +1,41 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LocationList } from "../../../components/location-list";
-import { getLocations } from "../../../lib/locations";
-import { SF_NEIGHBORHOODS, getNeighborhoodBySlug } from "../../../lib/neighborhoods";
+import { LocationList } from "../../../../components/location-list";
+import { getCityBySlug } from "../../../../lib/cities";
+import { getLocations } from "../../../../lib/locations";
+import { getNeighborhoodByCityAndSlug, ALL_NEIGHBORHOODS } from "../../../../lib/neighborhoods";
 import styles from "./page.module.css";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ city: string; slug: string }> };
 
 export async function generateStaticParams() {
-  return SF_NEIGHBORHOODS.map((n) => ({ slug: n.slug }));
+  return ALL_NEIGHBORHOODS.map((neighborhood) => ({
+    city: neighborhood.citySlug,
+    slug: neighborhood.slug,
+  }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const neighborhood = getNeighborhoodBySlug(slug);
-  if (!neighborhood) return {};
+  const { city, slug } = await params;
+  const cityMeta = getCityBySlug(city);
+  const neighborhood = getNeighborhoodByCityAndSlug(city, slug);
+
+  if (!cityMeta || !neighborhood) return {};
+
   return {
-    title: `Free Food in ${neighborhood.name}, San Francisco`,
+    title: `Free Food in ${neighborhood.name}, ${cityMeta.name}`,
     description: `${neighborhood.description}. Food banks, soup kitchens, and pantries nearby.`,
-    alternates: { canonical: `/neighborhood/${slug}` },
+    alternates: { canonical: `/${city}/neighborhood/${slug}` },
   };
 }
 
 export default async function NeighborhoodPage({ params }: Props) {
-  const { slug } = await params;
-  const neighborhood = getNeighborhoodBySlug(slug);
-  if (!neighborhood) notFound();
+  const { city, slug } = await params;
+  const cityMeta = getCityBySlug(city);
+  const neighborhood = getNeighborhoodByCityAndSlug(city, slug);
+
+  if (!cityMeta || !neighborhood) notFound();
 
   const allLocations = await getLocations();
   const locations = allLocations.filter(
@@ -36,7 +45,7 @@ export default async function NeighborhoodPage({ params }: Props) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `Free Food in ${neighborhood.name}, San Francisco`,
+    name: `Free Food in ${neighborhood.name}, ${cityMeta.name}`,
     numberOfItems: locations.length,
     itemListElement: locations.map((loc, i) => ({
       "@type": "ListItem",
@@ -66,15 +75,20 @@ export default async function NeighborhoodPage({ params }: Props) {
         <Link href="/" className={styles.back}>← Back</Link>
         <h1 className={styles.heading}>Free Food in {neighborhood.name}</h1>
         <p className={styles.sub}>
-          San Francisco · {neighborhood.description.toLowerCase().replace(`free food in the ${neighborhood.name.toLowerCase()} neighborhood of san francisco`, "").replace(`free food in ${neighborhood.name.toLowerCase()} in san francisco`, "").trim() || "Food banks, soup kitchens, and pantries nearby."}
+          {cityMeta.name} · {neighborhood.description}. Food banks, soup kitchens, and pantries nearby.
         </p>
         {locations.length === 0 ? (
           <p className={styles.empty}>
             No locations found for this neighborhood yet.{" "}
-            <Link href="/">See all San Francisco locations →</Link>
+            <Link href="/">See all locations →</Link>
           </p>
         ) : (
-          <LocationList locations={locations} />
+          <LocationList
+            locations={locations}
+            heading={`${locations.length} free food locations in ${neighborhood.name}`}
+            ariaLabel={`Free food locations in ${neighborhood.name}`}
+            neighborhoodCitySlugs={[neighborhood.citySlug]}
+          />
         )}
       </main>
     </>
