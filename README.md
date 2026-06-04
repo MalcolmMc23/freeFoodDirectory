@@ -14,8 +14,6 @@
 
 Free Food Maps is an open directory of food banks, soup kitchens, community pantries, and free meal programs across San Francisco and Los Angeles. Every pin on the map is a real place you can walk into today.
 
-- **No ID required** — every listed location is accessible without documentation
-- **No questions asked** — we only list walk-in programs, no intake barriers
 - **Updated weekly** — pulled from local food bank networks and community sources
 - **Community notes** — anyone can leave tips on a location and vote helpful ones up
 
