@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!neighborhood) return {};
   return {
     title: `Free Food in ${neighborhood.name}, San Francisco`,
-    description: `${neighborhood.description}. Food banks, soup kitchens, and pantries — no ID required.`,
+    description: `${neighborhood.description}. Food banks, soup kitchens, and pantries nearby.`,
     alternates: { canonical: `/neighborhood/${slug}` },
   };
 }
@@ -66,7 +66,7 @@ export default async function NeighborhoodPage({ params }: Props) {
         <Link href="/" className={styles.back}>← Back</Link>
         <h1 className={styles.heading}>Free Food in {neighborhood.name}</h1>
         <p className={styles.sub}>
-          San Francisco · {neighborhood.description.toLowerCase().replace(`free food in the ${neighborhood.name.toLowerCase()} neighborhood of san francisco`, "").replace(`free food in ${neighborhood.name.toLowerCase()} in san francisco`, "").trim() || "No ID or questions required."}
+          San Francisco · {neighborhood.description.toLowerCase().replace(`free food in the ${neighborhood.name.toLowerCase()} neighborhood of san francisco`, "").replace(`free food in ${neighborhood.name.toLowerCase()} in san francisco`, "").trim() || "Food banks, soup kitchens, and pantries nearby."}
         </p>
         {locations.length === 0 ? (
           <p className={styles.empty}>

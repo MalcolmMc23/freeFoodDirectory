@@ -25,7 +25,7 @@ export default async function HomePage() {
           url: "https://freefoodmaps.com/assets/logo_transparent_background.png",
         },
         description:
-          "A free, open directory of food banks, soup kitchens, pantries, and community kitchens in San Francisco and Los Angeles. No ID required, no questions asked. Updated weekly.",
+          "A free, open directory of food banks, soup kitchens, pantries, and community kitchens in San Francisco and Los Angeles. Updated weekly.",
         areaServed: [
           { "@type": "City", name: "San Francisco", sameAs: "https://www.wikidata.org/wiki/Q62" },
           { "@type": "City", name: "Los Angeles", sameAs: "https://www.wikidata.org/wiki/Q65" },
