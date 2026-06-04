@@ -6,7 +6,7 @@ import "./globals.css";
 const SITE_URL = "https://freefoodmaps.com";
 const SITE_NAME = "Free Food Maps";
 const DESCRIPTION =
-  "Find free food in San Francisco. Food banks, soup kitchens, and community pantries — no ID, no questions. Updated weekly.";
+  "Find free food in San Francisco. Food banks, soup kitchens, and community pantries, updated weekly.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

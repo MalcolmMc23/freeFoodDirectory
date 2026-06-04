@@ -51,7 +51,7 @@ export default function OgImage() {
             lineHeight: 1.5,
           }}
         >
-          Find free food near you. No ID, no questions. Walk in.
+          Find free food near you. Food banks, pantries, and meals across San Francisco.
         </div>
         <div
           style={{
