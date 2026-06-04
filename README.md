@@ -33,6 +33,11 @@ Free Food Maps is an open directory of food banks, soup kitchens, community pant
       <strong>Los Angeles</strong><br />
       <a href="https://freefoodmaps.com">freefoodmaps.com</a>
     </td>
+    <td align="center">
+      <img src="docs/screenshot-nyc.png" alt="New York City map" width="380" /><br />
+      <strong>New York City</strong><br />
+      <a href="https://freefoodmaps.com">freefoodmaps.com</a>
+    </td>
   </tr>
 </table>
 
