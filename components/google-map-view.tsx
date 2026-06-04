@@ -379,7 +379,7 @@ export function GoogleMapView({
             { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#242430" }] },
             { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#16161a" }] },
             { featureType: "transit", stylers: [{ visibility: "off" }] },
-            { featureType: "water", elementType: "geometry", stylers: [{ color: "#080810" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#0a1622" }] },
             { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#6b6b74" }] },
           ],
         });
