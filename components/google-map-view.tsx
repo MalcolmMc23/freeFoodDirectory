@@ -290,6 +290,16 @@ type MarkerEntry = {
   openNow: boolean;
 };
 
+const SF_INITIAL_ZOOM = 13;
+const LA_INITIAL_ZOOM = 11;
+const NY_INITIAL_ZOOM = 11;
+
+const CITY_BUTTONS = [
+  { label: "Show SF Map", center: SAN_FRANCISCO, zoom: SF_INITIAL_ZOOM, className: "cityButtonSf" },
+  { label: "Show LA Map", center: LOS_ANGELES, zoom: LA_INITIAL_ZOOM, className: "cityButtonLa" },
+  { label: "Show NYC Map", center: NEW_YORK, zoom: NY_INITIAL_ZOOM, className: "cityButtonNy" },
+] as const;
+
 type Props = {
   locations: Location[];
   /** Where the map first centers. Map is shared — user can pan to either city. */
@@ -311,6 +321,13 @@ export function GoogleMapView({
   const markersRef = useRef<MarkerEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [filterOpenOnly, setFilterOpenOnly] = useState(false);
+
+  const jumpToCity = (center: LatLng, zoom: number) => {
+    const map = mapInstanceRef.current;
+    if (!map || !("setCenter" in map) || !("setZoom" in map)) return;
+    (map as typeof map & { setCenter: (value: LatLng) => void; setZoom: (value: number) => void }).setCenter(center);
+    (map as typeof map & { setCenter: (value: LatLng) => void; setZoom: (value: number) => void }).setZoom(zoom);
+  };
 
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
@@ -471,6 +488,16 @@ export function GoogleMapView({
           />
           Open now
         </label>
+        {CITY_BUTTONS.map((button) => (
+          <button
+            key={button.label}
+            type="button"
+            className={styles[button.className]}
+            onClick={() => jumpToCity(button.center, button.zoom)}
+          >
+            {button.label}
+          </button>
+        ))}
       </div>
       {error ? <div className={styles.error}>{error}</div> : null}
     </section>

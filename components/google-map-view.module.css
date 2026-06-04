@@ -15,6 +15,9 @@
   top: 12px;
   left: 12px;
   z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .filterLabel {
@@ -31,6 +34,46 @@
   cursor: pointer;
   user-select: none;
   backdrop-filter: blur(4px);
+}
+
+.cityButtonSf,
+.cityButtonLa,
+.cityButtonNy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 43px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1.5px solid transparent;
+  font-family: var(--hand);
+  font-size: 15px;
+  cursor: pointer;
+  transition: opacity 120ms ease-out;
+}
+
+.cityButtonSf:hover,
+.cityButtonLa:hover,
+.cityButtonNy:hover {
+  opacity: 0.88;
+}
+
+.cityButtonSf {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.cityButtonLa {
+  background: var(--accent-la);
+  border-color: var(--accent-la);
+  color: var(--accent-la-ink);
+}
+
+.cityButtonNy {
+  background: var(--accent-ny);
+  border-color: var(--accent-ny);
+  color: var(--accent-ny-ink);
 }
 
 .filterLabel input[type="checkbox"] {
