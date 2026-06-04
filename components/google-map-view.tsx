@@ -10,21 +10,23 @@ export type LatLng = { lat: number; lng: number };
 
 export const SAN_FRANCISCO: LatLng = { lat: 37.7749, lng: -122.4194 };
 export const LOS_ANGELES: LatLng = { lat: 34.0522, lng: -118.2437 };
+export const NEW_YORK: LatLng = { lat: 40.7128, lng: -74.006 };
 
-const SF_BOUNDS = { north: 37.970, south: 37.660, west: -122.560, east: -122.300 };
-const CA_BOUNDS = { north: 42.1, south: 32.5, west: -124.5, east: -113.9 };
-
-// Pin palette per city, matched to the "Show SF/LA Map" buttons.
+// Pin palette per city, matched to the "Show <City> Map" buttons.
 // Open-now stays green everywhere — universal "good to go" signal.
 const PIN_OPEN = { fill: "#81b29a", stroke: "#4a8c6f" } as const;
 const PIN_SF_CLOSED = { fill: "#f3a64a", stroke: "#c47d28" } as const;
 const PIN_LA_CLOSED = { fill: "#5fb6ec", stroke: "#3a8ec4" } as const;
+const PIN_NY_CLOSED = { fill: "#e26d6d", stroke: "#b54848" } as const;
 
-// Anything south of ~36°N is treated as the LA region.
+// City regions are inferred from coordinates. East coast (lng > -100) is NY;
+// south of ~36°N on the west coast is LA; everything else SF.
 const LA_REGION_MAX_LAT = 36;
+const EAST_COAST_LNG_MAX = -100;
 
 function pinPalette(loc: Location, openNow: boolean): { fill: string; stroke: string } {
   if (openNow) return PIN_OPEN;
+  if (typeof loc.lng === "number" && loc.lng > EAST_COAST_LNG_MAX) return PIN_NY_CLOSED;
   const isLA = typeof loc.lat === "number" && loc.lat < LA_REGION_MAX_LAT;
   return isLA ? PIN_LA_CLOSED : PIN_SF_CLOSED;
 }
@@ -384,10 +386,11 @@ export function GoogleMapView({
 
         mapInstanceRef.current = map as typeof mapInstanceRef.current;
 
-        // Two neighborhood overlays on the same map — each city keeps its own
+        // Three neighborhood overlays on the same map — each city keeps its own
         // hover color. Invisible by default; only outlines on hover.
         addNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson", "#f3a64a");
         addNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "#5fb6ec");
+        addNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "#e26d6d");
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
