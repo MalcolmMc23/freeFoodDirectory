@@ -71,6 +71,23 @@
   opacity: 0.88;
 }
 
+.buttonNy {
+  font-family: var(--hand);
+  font-size: 16px;
+  font-weight: 400;
+  padding: 10px 16px;
+  background: var(--accent-ny);
+  color: var(--accent-ny-ink);
+  border: 1.5px solid var(--accent-ny);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 120ms ease-out;
+}
+
+.buttonNy:hover {
+  opacity: 0.88;
+}
+
 .links {
   display: flex;
   align-items: center;
