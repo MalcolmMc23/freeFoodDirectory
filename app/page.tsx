@@ -89,7 +89,10 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HomePageClient locations={locations} locationList={<LocationList locations={locations} />} />
+      <HomePageClient
+        locations={locations}
+        locationList={<LocationList locations={locations} showLocationList={false} />}
+      />
     </>
   );
 }

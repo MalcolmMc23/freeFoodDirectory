@@ -11,6 +11,9 @@ type Props = {
   heading?: string;
   ariaLabel?: string;
   neighborhoodCitySlugs?: CitySlug[];
+  // When false, hide the heading + full list of every location and render
+  // only the "Browse <city> by neighborhood" pills. Used on the homepage.
+  showLocationList?: boolean;
 };
 
 export function LocationList({
@@ -18,6 +21,7 @@ export function LocationList({
   heading = `${locations.length} free food locations in our system`,
   ariaLabel = "All free food locations in our system",
   neighborhoodCitySlugs = SUPPORTED_CITIES.map((city) => city.slug),
+  showLocationList = true,
 }: Props) {
   const neighborhoodGroups = neighborhoodCitySlugs
     .map((citySlug) => {
@@ -55,23 +59,27 @@ export function LocationList({
           ))}
         </div>
       )}
-      <h2 className={styles.heading}>{heading}</h2>
-      <ul className={styles.list}>
-        {locations.map((loc) => {
-          const neighborhood = getNeighborhoodByLocation(loc);
-          const scheduleSummary = getLocationScheduleSummary(loc);
-          return (
-            <li key={loc.id} className={styles.item}>
-              <span className={styles.name}>{loc.name}</span>
-              <span className={styles.meta}>
-                {loc.addressLine}
-                {neighborhood ? ` · ${neighborhood.name}` : ""}
-                {scheduleSummary ? ` · ${scheduleSummary}` : ""}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
+      {showLocationList && (
+        <>
+          <h2 className={styles.heading}>{heading}</h2>
+          <ul className={styles.list}>
+            {locations.map((loc) => {
+              const neighborhood = getNeighborhoodByLocation(loc);
+              const scheduleSummary = getLocationScheduleSummary(loc);
+              return (
+                <li key={loc.id} className={styles.item}>
+                  <span className={styles.name}>{loc.name}</span>
+                  <span className={styles.meta}>
+                    {loc.addressLine}
+                    {neighborhood ? ` · ${neighborhood.name}` : ""}
+                    {scheduleSummary ? ` · ${scheduleSummary}` : ""}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
     </section>
   );
 }
