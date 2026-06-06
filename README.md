@@ -102,7 +102,7 @@ supabase db reset         # applies migrations + seed data
 
 ## Scraper
 
-An automated agent ("Jeremey") keeps listings current. The scraper lives in `scraper/` and targets the SF-Marin Food Bank locator.
+An automated agent ("Malcolm") keeps listings current. The scraper lives in `scraper/` and targets the SF-Marin Food Bank locator.
 
 ```bash
 cd scraper
