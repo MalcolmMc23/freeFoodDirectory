@@ -319,9 +319,9 @@ function neonColorFor(key: string): string {
 }
 
 /**
- * Always-on neon outline + light fill tint per feature. Each neighborhood
- * gets a deterministic neon color so adjacent ones stand apart. Hover
- * intensifies stroke + fill (same gold-highlight feel, just brighter).
+ * Invisible by default. On hover, the hovered neighborhood reveals its own
+ * deterministic neon color (dimmer than full neon so it sits comfortably on
+ * the dark map).
  */
 function addNeonNeighborhoodOverlay(
   layer: GoogleMapsDataLayer,
@@ -329,26 +329,16 @@ function addNeonNeighborhoodOverlay(
   nameKey: string = "nhood",
 ): void {
   layer.loadGeoJson(geojsonUrl);
-  layer.setStyle((feature) => {
-    const name = String(feature.getProperty(nameKey) ?? "");
-    const color = neonColorFor(name);
-    return {
-      strokeColor: color,
-      strokeWeight: 1.5,
-      strokeOpacity: 0.9,
-      fillColor: color,
-      fillOpacity: 0.1,
-    };
-  });
+  layer.setStyle({ strokeOpacity: 0, fillOpacity: 0 });
   layer.addListener("mouseover", (e) => {
     const name = String(e.feature.getProperty(nameKey) ?? "");
     const color = neonColorFor(name);
     layer.overrideStyle(e.feature, {
       strokeColor: color,
-      strokeWeight: 3,
-      strokeOpacity: 1,
+      strokeWeight: 2,
+      strokeOpacity: 0.75,
       fillColor: color,
-      fillOpacity: 0.22,
+      fillOpacity: 0.1,
     });
   });
   layer.addListener("mouseout", () => {
