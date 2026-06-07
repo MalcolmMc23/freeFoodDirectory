@@ -11,6 +11,7 @@ export type LatLng = { lat: number; lng: number };
 export const SAN_FRANCISCO: LatLng = { lat: 37.7749, lng: -122.4194 };
 export const LOS_ANGELES: LatLng = { lat: 34.0522, lng: -118.2437 };
 export const NEW_YORK: LatLng = { lat: 40.7128, lng: -74.006 };
+export const SEATTLE: LatLng = { lat: 47.6062, lng: -122.3321 };
 
 // Pin palette per city, matched to the "Show <City> Map" buttons.
 // Open-now stays green everywhere — universal "good to go" signal.
@@ -18,15 +19,19 @@ const PIN_OPEN = { fill: "#81b29a", stroke: "#4a8c6f" } as const;
 const PIN_SF_CLOSED = { fill: "#f3a64a", stroke: "#c47d28" } as const;
 const PIN_LA_CLOSED = { fill: "#5fb6ec", stroke: "#3a8ec4" } as const;
 const PIN_NY_CLOSED = { fill: "#e26d6d", stroke: "#b54848" } as const;
+const PIN_SEA_CLOSED = { fill: "#a87fd1", stroke: "#7a52a6" } as const;
 
 // City regions are inferred from coordinates. East coast (lng > -100) is NY;
-// south of ~36°N on the west coast is LA; everything else SF.
+// north of ~45°N on the west coast is Seattle; south of ~36°N is LA;
+// everything else SF.
 const LA_REGION_MAX_LAT = 36;
+const SEA_REGION_MIN_LAT = 45;
 const EAST_COAST_LNG_MAX = -100;
 
 function pinPalette(loc: Location, openNow: boolean): { fill: string; stroke: string } {
   if (openNow) return PIN_OPEN;
   if (typeof loc.lng === "number" && loc.lng > EAST_COAST_LNG_MAX) return PIN_NY_CLOSED;
+  if (typeof loc.lat === "number" && loc.lat >= SEA_REGION_MIN_LAT) return PIN_SEA_CLOSED;
   const isLA = typeof loc.lat === "number" && loc.lat < LA_REGION_MAX_LAT;
   return isLA ? PIN_LA_CLOSED : PIN_SF_CLOSED;
 }

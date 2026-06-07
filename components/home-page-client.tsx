@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { Location } from "../lib/types";
-import { GoogleMapView, SAN_FRANCISCO, LOS_ANGELES, NEW_YORK, type LatLng } from "./google-map-view";
+import { GoogleMapView, SAN_FRANCISCO, LOS_ANGELES, NEW_YORK, SEATTLE, type LatLng } from "./google-map-view";
 import { CommunityNotesHost } from "./community-notes/CommunityNotesPanel";
 import styles from "../app/page.module.css";
 
@@ -18,6 +18,7 @@ type Props = {
 const SF_INITIAL_ZOOM = 13;
 const LA_INITIAL_ZOOM = 11;
 const NY_INITIAL_ZOOM = 11;
+const SEA_INITIAL_ZOOM = 11;
 
 export function HomePageClient({ locations, locationList }: Props) {
   // null = landing; otherwise holds the initial center + zoom for the (shared) map.
@@ -66,6 +67,12 @@ export function HomePageClient({ locations, locationList }: Props) {
             onClick={() => setMapView({ center: NEW_YORK, zoom: NY_INITIAL_ZOOM })}
           >
             Show NYC Map
+          </button>
+          <button
+            className={styles.buttonSea}
+            onClick={() => setMapView({ center: SEATTLE, zoom: SEA_INITIAL_ZOOM })}
+          >
+            Show Seattle Map
           </button>
         </div>
         <div className={styles.links}>
