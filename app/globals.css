@@ -22,6 +22,9 @@
   /* NYC accent: same family as gold/blue, soft warm red. */
   --accent-ny: #e26d6d;
   --accent-ny-ink: #2a0a0a;
+  /* Seattle accent: same family, soft lavender / muted purple. */
+  --accent-sea: #a87fd1;
+  --accent-sea-ink: #1b0e2a;
   --open: #6fc78a;
   --closed: #e07676;
   --info: #7fb6e6;
