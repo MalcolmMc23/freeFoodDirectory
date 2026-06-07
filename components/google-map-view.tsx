@@ -432,11 +432,12 @@ export function GoogleMapView({
 
         mapInstanceRef.current = map as typeof mapInstanceRef.current;
 
-        // All three cities use the same hover-only neon palette. SF features
-        // are keyed on `nhood`; LA and NYC both use `name`.
+        // All four cities use the same hover-only neon palette. SF features
+        // are keyed on `nhood`; LA, NYC, and Seattle all use `name`.
         addNeonNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson");
         addNeonNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "name");
         addNeonNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "name");
+        addNeonNeighborhoodOverlay(new Data({ map }), "/seattle-neighborhoods.geojson", "name");
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
