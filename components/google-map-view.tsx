@@ -31,12 +31,15 @@ function pinPalette(loc: Location, openNow: boolean): { fill: string; stroke: st
   return isLA ? PIN_LA_CLOSED : PIN_SF_CLOSED;
 }
 
+type GeoFeature = { getProperty: (key: string) => unknown };
+type GeoStyle = object;
+
 type GoogleMapsDataLayer = {
   loadGeoJson: (url: string) => void;
-  setStyle: (style: object) => void;
-  overrideStyle: (feature: object, style: object) => void;
+  setStyle: (style: GeoStyle | ((feature: GeoFeature) => GeoStyle)) => void;
+  overrideStyle: (feature: GeoFeature, style: GeoStyle) => void;
   revertStyle: () => void;
-  addListener: (event: string, cb: (e: { feature: object }) => void) => void;
+  addListener: (event: string, cb: (e: { feature: GeoFeature }) => void) => void;
   setMap: (map: object | null) => void;
 };
 
@@ -261,21 +264,59 @@ function googleMapsDirectionsUrl(loc: Location): string {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-/** Attach a neighborhood GeoJSON to a Data layer, invisible until hovered. */
-function addNeighborhoodOverlay(
+// Neon palette for per-neighborhood hover tinting. Picked for high contrast
+// against the dark map and against each other.
+const NEON_PALETTE = [
+  "#39ff14", // neon green
+  "#ff073a", // neon red
+  "#00f5ff", // neon cyan
+  "#ff00ff", // magenta
+  "#ffff00", // yellow
+  "#ff6ec7", // hot pink
+  "#9d00ff", // electric purple
+  "#ff7f00", // neon orange
+  "#00ff9f", // mint
+  "#7df9ff", // electric blue
+  "#ccff00", // chartreuse
+  "#ff5e00", // safety orange
+] as const;
+
+// FNV-1a — small, dependency-free, stable across reloads so every
+// neighborhood always gets the same color.
+function hashString(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+function neonColorFor(key: string): string {
+  return NEON_PALETTE[hashString(key) % NEON_PALETTE.length];
+}
+
+/**
+ * Invisible by default. On hover, the hovered neighborhood reveals its own
+ * deterministic neon color (dimmer than full neon so it sits comfortably on
+ * the dark map).
+ */
+function addNeonNeighborhoodOverlay(
   layer: GoogleMapsDataLayer,
   geojsonUrl: string,
-  hoverColor: string,
+  nameKey: string = "nhood",
 ): void {
   layer.loadGeoJson(geojsonUrl);
   layer.setStyle({ strokeOpacity: 0, fillOpacity: 0 });
   layer.addListener("mouseover", (e) => {
+    const name = String(e.feature.getProperty(nameKey) ?? "");
+    const color = neonColorFor(name);
     layer.overrideStyle(e.feature, {
-      strokeColor: hoverColor,
-      strokeWeight: 3,
-      strokeOpacity: 1,
-      fillColor: hoverColor,
-      fillOpacity: 0.08,
+      strokeColor: color,
+      strokeWeight: 2,
+      strokeOpacity: 0.75,
+      fillColor: color,
+      fillOpacity: 0.1,
     });
   });
   layer.addListener("mouseout", () => {
@@ -386,11 +427,11 @@ export function GoogleMapView({
 
         mapInstanceRef.current = map as typeof mapInstanceRef.current;
 
-        // Three neighborhood overlays on the same map — each city keeps its own
-        // hover color. Invisible by default; only outlines on hover.
-        addNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson", "#f3a64a");
-        addNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "#5fb6ec");
-        addNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "#e26d6d");
+        // All three cities use the same hover-only neon palette. SF features
+        // are keyed on `nhood`; LA and NYC both use `name`.
+        addNeonNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson");
+        addNeonNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "name");
+        addNeonNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "name");
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
