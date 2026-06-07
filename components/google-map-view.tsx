@@ -264,29 +264,7 @@ function googleMapsDirectionsUrl(loc: Location): string {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-/** Attach a neighborhood GeoJSON to a Data layer, invisible until hovered. */
-function addNeighborhoodOverlay(
-  layer: GoogleMapsDataLayer,
-  geojsonUrl: string,
-  hoverColor: string,
-): void {
-  layer.loadGeoJson(geojsonUrl);
-  layer.setStyle({ strokeOpacity: 0, fillOpacity: 0 });
-  layer.addListener("mouseover", (e) => {
-    layer.overrideStyle(e.feature, {
-      strokeColor: hoverColor,
-      strokeWeight: 3,
-      strokeOpacity: 1,
-      fillColor: hoverColor,
-      fillOpacity: 0.08,
-    });
-  });
-  layer.addListener("mouseout", () => {
-    layer.revertStyle();
-  });
-}
-
-// Neon palette for always-on neighborhood tinting. Picked for high contrast
+// Neon palette for per-neighborhood hover tinting. Picked for high contrast
 // against the dark map and against each other.
 const NEON_PALETTE = [
   "#39ff14", // neon green
@@ -449,11 +427,11 @@ export function GoogleMapView({
 
         mapInstanceRef.current = map as typeof mapInstanceRef.current;
 
-        // SF gets an always-on neon palette (each neighborhood its own color).
-        // LA + NYC keep the invisible-until-hover overlay for now.
+        // All three cities use the same hover-only neon palette. SF features
+        // are keyed on `nhood`; LA and NYC both use `name`.
         addNeonNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson");
-        addNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "#5fb6ec");
-        addNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "#e26d6d");
+        addNeonNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "name");
+        addNeonNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "name");
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
