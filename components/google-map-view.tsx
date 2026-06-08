@@ -50,7 +50,7 @@ type GoogleMapsDataLayer = {
   loadGeoJson: (url: string) => void;
   setStyle: (style: GeoStyle | ((feature: GeoFeature) => GeoStyle)) => void;
   overrideStyle: (feature: GeoFeature, style: GeoStyle) => void;
-  revertStyle: () => void;
+  revertStyle: (feature?: GeoFeature) => void;
   addListener: (event: string, cb: (e: { feature: GeoFeature }) => void) => void;
   setMap: (map: object | null) => void;
 };
@@ -308,16 +308,22 @@ function neonColorFor(key: string): string {
   return NEON_PALETTE[hashString(key) % NEON_PALETTE.length];
 }
 
+// Ambient twinkle cadence — gentle "city is alive" feel without being chaotic.
+const TWINKLE_INTERVAL_MS = 850;
+const TWINKLE_DURATION_MS = 1200;
+
 /**
  * Invisible by default. On hover, the hovered neighborhood reveals its own
  * deterministic neon color (dimmer than full neon so it sits comfortably on
- * the dark map).
+ * the dark map). Also starts an ambient twinkle: every ~850ms a random
+ * feature briefly glows in its neon color and fades back, like a skyline at
+ * night. Returns a cleanup function that stops the twinkle on unmount.
  */
 function addNeonNeighborhoodOverlay(
   layer: GoogleMapsDataLayer,
   geojsonUrl: string,
   nameKey: string = "nhood",
-): void {
+): () => void {
   layer.loadGeoJson(geojsonUrl);
   layer.setStyle({ strokeOpacity: 0, fillOpacity: 0 });
   layer.addListener("mouseover", (e) => {
@@ -334,6 +340,38 @@ function addNeonNeighborhoodOverlay(
   layer.addListener("mouseout", () => {
     layer.revertStyle();
   });
+
+  // Collect features as they finish loading so the twinkle has a pool to
+  // draw from. The "addfeature" event fires once per polygon parsed.
+  const features: GeoFeature[] = [];
+  layer.addListener("addfeature", (e) => {
+    features.push(e.feature);
+  });
+
+  // Respect prefers-reduced-motion — no ambient animation for those users.
+  const reduceMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) return () => {};
+
+  const interval = window.setInterval(() => {
+    if (features.length === 0) return;
+    const feature = features[Math.floor(Math.random() * features.length)];
+    const name = String(feature.getProperty(nameKey) ?? "");
+    const color = neonColorFor(name);
+    layer.overrideStyle(feature, {
+      strokeColor: color,
+      strokeWeight: 1.5,
+      strokeOpacity: 0.55,
+      fillColor: color,
+      fillOpacity: 0.06,
+    });
+    window.setTimeout(() => {
+      layer.revertStyle(feature);
+    }, TWINKLE_DURATION_MS);
+  }, TWINKLE_INTERVAL_MS);
+
+  return () => window.clearInterval(interval);
 }
 
 type MarkerEntry = {
@@ -372,6 +410,7 @@ export function GoogleMapView({
     }
 
     let cancelled = false;
+    const overlayCleanups: Array<() => void> = [];
 
     const initializeMap = async () => {
       try {
@@ -439,13 +478,16 @@ export function GoogleMapView({
 
         mapInstanceRef.current = map as typeof mapInstanceRef.current;
 
-        // All five cities use the same hover-only neon palette. SF features
-        // are keyed on `nhood`; the rest all use `name`.
-        addNeonNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson");
-        addNeonNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "name");
-        addNeonNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "name");
-        addNeonNeighborhoodOverlay(new Data({ map }), "/seattle-neighborhoods.geojson", "name");
-        addNeonNeighborhoodOverlay(new Data({ map }), "/las-vegas-neighborhoods.geojson", "name");
+        // All five cities use the same hover-only neon palette + ambient
+        // twinkle. SF features are keyed on `nhood`; the rest use `name`.
+        // Cleanup functions stop the twinkle intervals on unmount.
+        overlayCleanups.push(
+          addNeonNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson"),
+          addNeonNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "name"),
+          addNeonNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "name"),
+          addNeonNeighborhoodOverlay(new Data({ map }), "/seattle-neighborhoods.geojson", "name"),
+          addNeonNeighborhoodOverlay(new Data({ map }), "/las-vegas-neighborhoods.geojson", "name"),
+        );
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
@@ -502,6 +544,7 @@ export function GoogleMapView({
 
     return () => {
       cancelled = true;
+      overlayCleanups.forEach((stop) => stop());
     };
   }, [locations, initialCenter, initialZoom]);
 
