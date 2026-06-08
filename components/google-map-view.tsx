@@ -12,6 +12,7 @@ export const SAN_FRANCISCO: LatLng = { lat: 37.7749, lng: -122.4194 };
 export const LOS_ANGELES: LatLng = { lat: 34.0522, lng: -118.2437 };
 export const NEW_YORK: LatLng = { lat: 40.7128, lng: -74.006 };
 export const SEATTLE: LatLng = { lat: 47.6062, lng: -122.3321 };
+export const LAS_VEGAS: LatLng = { lat: 36.1699, lng: -115.1398 };
 
 // Pin palette per city, matched to the "Show <City> Map" buttons.
 // Open-now stays green everywhere — universal "good to go" signal.
@@ -20,19 +21,25 @@ const PIN_SF_CLOSED = { fill: "#f3a64a", stroke: "#c47d28" } as const;
 const PIN_LA_CLOSED = { fill: "#5fb6ec", stroke: "#3a8ec4" } as const;
 const PIN_NY_CLOSED = { fill: "#e26d6d", stroke: "#b54848" } as const;
 const PIN_SEA_CLOSED = { fill: "#a87fd1", stroke: "#7a52a6" } as const;
+const PIN_VEGAS_CLOSED = { fill: "#e571c0", stroke: "#b04694" } as const;
 
 // City regions are inferred from coordinates. East coast (lng > -100) is NY;
-// north of ~45°N on the west coast is Seattle; south of ~36°N is LA;
-// everything else SF.
+// north of ~45°N is Seattle; the inland NV band (lng -116..-114) is Vegas;
+// south of ~36°N is LA; everything else SF.
 const LA_REGION_MAX_LAT = 36;
 const SEA_REGION_MIN_LAT = 45;
 const EAST_COAST_LNG_MAX = -100;
+const VEGAS_LNG_MIN = -116;
+const VEGAS_LNG_MAX = -114;
 
 function pinPalette(loc: Location, openNow: boolean): { fill: string; stroke: string } {
   if (openNow) return PIN_OPEN;
-  if (typeof loc.lng === "number" && loc.lng > EAST_COAST_LNG_MAX) return PIN_NY_CLOSED;
-  if (typeof loc.lat === "number" && loc.lat >= SEA_REGION_MIN_LAT) return PIN_SEA_CLOSED;
-  const isLA = typeof loc.lat === "number" && loc.lat < LA_REGION_MAX_LAT;
+  const lat = loc.lat;
+  const lng = loc.lng;
+  if (typeof lng === "number" && lng > EAST_COAST_LNG_MAX) return PIN_NY_CLOSED;
+  if (typeof lat === "number" && lat >= SEA_REGION_MIN_LAT) return PIN_SEA_CLOSED;
+  if (typeof lng === "number" && lng >= VEGAS_LNG_MIN && lng <= VEGAS_LNG_MAX) return PIN_VEGAS_CLOSED;
+  const isLA = typeof lat === "number" && lat < LA_REGION_MAX_LAT;
   return isLA ? PIN_LA_CLOSED : PIN_SF_CLOSED;
 }
 
@@ -432,12 +439,13 @@ export function GoogleMapView({
 
         mapInstanceRef.current = map as typeof mapInstanceRef.current;
 
-        // All four cities use the same hover-only neon palette. SF features
-        // are keyed on `nhood`; LA, NYC, and Seattle all use `name`.
+        // All five cities use the same hover-only neon palette. SF features
+        // are keyed on `nhood`; the rest all use `name`.
         addNeonNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson");
         addNeonNeighborhoodOverlay(new Data({ map }), "/la-neighborhoods.geojson", "name");
         addNeonNeighborhoodOverlay(new Data({ map }), "/nyc-neighborhoods.geojson", "name");
         addNeonNeighborhoodOverlay(new Data({ map }), "/seattle-neighborhoods.geojson", "name");
+        addNeonNeighborhoodOverlay(new Data({ map }), "/las-vegas-neighborhoods.geojson", "name");
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
         (window as Window & { __closeInfoWindow?: () => void }).__closeInfoWindow = () => {
