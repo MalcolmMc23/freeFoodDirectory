@@ -28,6 +28,9 @@
   /* Las Vegas accent: same family, hot pink / magenta (Strip neon vibe). */
   --accent-vegas: #e571c0;
   --accent-vegas-ink: #2a0a1c;
+  /* Houston accent: same family, jade teal. */
+  --accent-houston: #5fc7b8;
+  --accent-houston-ink: #07211c;
   --open: #6fc78a;
   --closed: #e07676;
   --info: #7fb6e6;
