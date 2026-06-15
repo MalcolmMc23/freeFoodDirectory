@@ -14,6 +14,7 @@ export const NEW_YORK: LatLng = { lat: 40.7128, lng: -74.006 };
 export const SEATTLE: LatLng = { lat: 47.6062, lng: -122.3321 };
 export const LAS_VEGAS: LatLng = { lat: 36.1699, lng: -115.1398 };
 export const HOUSTON: LatLng = { lat: 29.7604, lng: -95.3698 };
+export const NEW_JERSEY: LatLng = { lat: 40.7357, lng: -74.1724 };
 
 // Pin palette per city, matched to the "Show <City> Map" buttons.
 // Open-now stays green everywhere — universal "good to go" signal.
@@ -24,12 +25,14 @@ const PIN_NY_CLOSED = { fill: "#e26d6d", stroke: "#b54848" } as const;
 const PIN_SEA_CLOSED = { fill: "#a87fd1", stroke: "#7a52a6" } as const;
 const PIN_VEGAS_CLOSED = { fill: "#e571c0", stroke: "#b04694" } as const;
 const PIN_HOUSTON_CLOSED = { fill: "#5fc7b8", stroke: "#3a9385" } as const;
+const PIN_NJ_CLOSED = { fill: "#5b73d1", stroke: "#3a4ea1" } as const;
 
 // City regions are inferred from coordinates. Checked in order:
-// Houston bbox (TX coast) → east-coast lng band is NY → north of ~45°N is
-// Seattle → the inland NV band (-116..-114) is Vegas → south of ~36°N is
-// LA → everything else SF. Houston is checked first because it sits east
-// of -100 and would otherwise fall into the NY bucket.
+// Houston bbox (TX coast) → NJ bbox (everything west of the Hudson) →
+// east-coast lng band is NY → north of ~45°N is Seattle → the inland NV
+// band (-116..-114) is Vegas → south of ~36°N is LA → everything else SF.
+// Houston + NJ are checked first because they sit east of -100°W and
+// would otherwise fall into the NY bucket.
 const LA_REGION_MAX_LAT = 36;
 const SEA_REGION_MIN_LAT = 45;
 const EAST_COAST_LNG_MAX = -100;
@@ -39,6 +42,12 @@ const HOUSTON_LAT_MIN = 29;
 const HOUSTON_LAT_MAX = 31;
 const HOUSTON_LNG_MIN = -96;
 const HOUSTON_LNG_MAX = -94;
+// NJ bbox stops at -74.0 so anything east of the Hudson (NYC proper)
+// still resolves to PIN_NY_CLOSED.
+const NJ_LAT_MIN = 38.9;
+const NJ_LAT_MAX = 41.4;
+const NJ_LNG_MIN = -75.6;
+const NJ_LNG_MAX = -74.0;
 
 function pinPalette(loc: Location, openNow: boolean): { fill: string; stroke: string } {
   if (openNow) return PIN_OPEN;
@@ -50,6 +59,12 @@ function pinPalette(loc: Location, openNow: boolean): { fill: string; stroke: st
     lat >= HOUSTON_LAT_MIN && lat <= HOUSTON_LAT_MAX &&
     lng >= HOUSTON_LNG_MIN && lng <= HOUSTON_LNG_MAX
   ) return PIN_HOUSTON_CLOSED;
+  if (
+    typeof lat === "number" &&
+    typeof lng === "number" &&
+    lat >= NJ_LAT_MIN && lat <= NJ_LAT_MAX &&
+    lng >= NJ_LNG_MIN && lng <= NJ_LNG_MAX
+  ) return PIN_NJ_CLOSED;
   if (typeof lng === "number" && lng > EAST_COAST_LNG_MAX) return PIN_NY_CLOSED;
   if (typeof lat === "number" && lat >= SEA_REGION_MIN_LAT) return PIN_SEA_CLOSED;
   if (typeof lng === "number" && lng >= VEGAS_LNG_MIN && lng <= VEGAS_LNG_MAX) return PIN_VEGAS_CLOSED;
@@ -492,8 +507,9 @@ export function GoogleMapView({
 
         mapInstanceRef.current = map as typeof mapInstanceRef.current;
 
-        // All six cities use the same hover-only neon palette + ambient
+        // All seven regions use the same hover-only neon palette + ambient
         // twinkle. SF features are keyed on `nhood`; the rest use `name`.
+        // (NJ shows counties since it's a state-wide view, not a single city.)
         // Cleanup functions stop the twinkle intervals on unmount.
         overlayCleanups.push(
           addNeonNeighborhoodOverlay(new Data({ map }), "/sf-neighborhoods.geojson"),
@@ -502,6 +518,7 @@ export function GoogleMapView({
           addNeonNeighborhoodOverlay(new Data({ map }), "/seattle-neighborhoods.geojson", "name"),
           addNeonNeighborhoodOverlay(new Data({ map }), "/las-vegas-neighborhoods.geojson", "name"),
           addNeonNeighborhoodOverlay(new Data({ map }), "/houston-neighborhoods.geojson", "name"),
+          addNeonNeighborhoodOverlay(new Data({ map }), "/new-jersey-counties.geojson", "name"),
         );
 
         let openWindow: InstanceType<typeof InfoWindow> | null = null;
