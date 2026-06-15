@@ -139,6 +139,23 @@
   opacity: 0.88;
 }
 
+.buttonNj {
+  font-family: var(--hand);
+  font-size: 16px;
+  font-weight: 400;
+  padding: 10px 16px;
+  background: var(--accent-nj);
+  color: var(--accent-nj-ink);
+  border: 1.5px solid var(--accent-nj);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 120ms ease-out;
+}
+
+.buttonNj:hover {
+  opacity: 0.88;
+}
+
 .links {
   display: flex;
   align-items: center;

@@ -31,6 +31,9 @@
   /* Houston accent: same family, jade teal. */
   --accent-houston: #5fc7b8;
   --accent-houston-ink: #07211c;
+  /* New Jersey accent: same family, periwinkle / indigo blue. */
+  --accent-nj: #5b73d1;
+  --accent-nj-ink: #0a0f24;
   --open: #6fc78a;
   --closed: #e07676;
   --info: #7fb6e6;
