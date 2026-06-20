@@ -30,76 +30,92 @@
   max-width: 520px;
 }
 
-/* City picker dropdown — one trigger replaces the per-city button grid.
-   Each menu item's text color is set inline from the city's accent CSS var. */
-.menuWrap {
+/* City picker wheel — iOS-style 3D drum.
+   The scroll container provides momentum + scroll-snap; per-item rotateX
+   is set inline from JS based on each row's distance to the scroll center. */
+.wheel {
   position: relative;
-  display: inline-block;
+  width: 300px;
+  /* Perspective on the outer wrapper gives child rotateX a real 3D look
+     without flattening (overflow on the scroller would otherwise clip 3D). */
+  perspective: 900px;
+  perspective-origin: 50% 50%;
 }
 
-.menuTrigger {
-  display: inline-flex;
+.wheelScroll {
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  outline: none;
+}
+
+.wheelScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.wheelItem {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font-family: var(--hand);
-  font-size: 18px;
-  font-weight: 400;
-  padding: 12px 22px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  border: 1.5px solid var(--accent);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: opacity 120ms ease-out;
-}
-
-.menuTrigger:hover {
-  opacity: 0.88;
-}
-
-.menuCaret {
-  display: inline-block;
-  transition: transform 160ms ease-out;
-}
-
-.menuCaretOpen {
-  transform: rotate(180deg);
-}
-
-.menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 220px;
-  margin: 0;
-  padding: 6px 0;
-  list-style: none;
-  background: var(--panel);
-  border: 1px solid var(--stroke);
-  border-radius: 8px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-  z-index: 10;
-}
-
-.menuItem {
-  display: block;
+  justify-content: center;
   width: 100%;
-  padding: 10px 18px;
   background: transparent;
   border: 0;
-  font-family: var(--hand);
-  font-size: 18px;
-  font-weight: 400;
-  text-align: left;
   cursor: pointer;
-  transition: background 120ms ease-out;
+  font-family: var(--hand);
+  font-size: 28px;
+  font-weight: 400;
+  scroll-snap-align: center;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-.menuItem:hover,
-.menuItem:focus-visible {
-  background: rgba(236, 236, 239, 0.06);
+.wheelItem:focus-visible {
   outline: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Selection slot — two faint horizontal lines centered on the picker. */
+.wheelBand {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  height: 60px;
+  transform: translateY(-50%);
+  border-top: 1px solid var(--stroke);
+  border-bottom: 1px solid var(--stroke);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Top/bottom fade so items dissolve into the bg as they leave the wheel. */
+.wheelFade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(
+      to bottom,
+      var(--bg) 0%,
+      rgba(14, 14, 16, 0) 28%,
+      rgba(14, 14, 16, 0) 72%,
+      var(--bg) 100%
+    );
+}
+
+.wheelHint {
+  margin: 0;
+  font-family: var(--hand);
+  font-size: 13px;
+  color: var(--ink-mute);
+  letter-spacing: 0.02em;
 }
 
 .links {
